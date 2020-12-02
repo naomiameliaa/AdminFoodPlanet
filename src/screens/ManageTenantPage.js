@@ -28,15 +28,15 @@ const styles = StyleSheet.create({
   },
   headerContainer: {
     flexDirection: 'column',
-    marginVertical: 20,
-    borderColor: 'red',
-    borderWidth: 2,
+    marginBottom: 20,
+    alignItems: 'center',
   },
   contentContainer: {},
   boxContainer: {
     marginBottom: normalize(20),
     flexDirection: 'row',
     backgroundColor: theme.colors.light_grey,
+    borderRadius: 10,
   },
   titleStyle: {
     fontSize: normalize(24),
@@ -109,8 +109,7 @@ function ManageTenantPage({navigation}) {
     const foodcourtId = await getDataAdmin();
     try {
       const response = await axios.get(
-        // 'https://food-planet.herokuapp.com/tenants/foodcourt',
-        'http://172.18.0.1:8080/tenants/foodcourt',
+        'https://food-planet.herokuapp.com/tenants/foodcourt',
         {
           params: {
             foodcourtId: foodcourtId,
@@ -119,7 +118,6 @@ function ManageTenantPage({navigation}) {
       );
       if (response.data.msg === 'Query success') {
         setTenantData(response.data.object);
-        console.log('TENANT DATA: ', response.data.object);
       }
     } catch (error) {
       setErrorMessage('Something went wrong');
@@ -130,7 +128,7 @@ function ManageTenantPage({navigation}) {
   async function deleteTenant(tenantId) {
     try {
       const response = await axios.delete(
-        'http://172.18.0.1:8080/tenants/delete',
+        'https://food-planet.herokuapp.com/tenants/delete',
         {
           params: {
             tenantId: tenantId,
@@ -226,8 +224,8 @@ function ManageTenantPage({navigation}) {
           }}
         />
       </View>
+      <Title text="Manage Tenants" txtStyle={styles.titleStyle} />
       <View style={styles.headerContainer}>
-        <Title text="Manage Tenants" txtStyle={styles.titleStyle} />
         <View style={styles.searchWrapper}>
           <Image
             style={styles.iconSearch}

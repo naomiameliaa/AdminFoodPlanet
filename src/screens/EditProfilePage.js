@@ -8,7 +8,7 @@ import {
   Dimensions,
   ScrollView,
 } from 'react-native';
-import {normalize} from '../utils';
+import {getData, normalize} from '../utils';
 import ButtonText from '../components/ButtonText';
 import ButtonKit from '../components/ButtonKit';
 import Title from '../components/Title';
@@ -34,8 +34,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginVertical: normalize(20),
-    borderColor: theme.colors.black,
-    borderWidth: 2,
   },
   inputStyle: {
     width: SCREEN_WIDTH * 0.9,
@@ -114,14 +112,16 @@ function EditProfilePage({route}) {
   const [filePath, setFilePath] = React.useState('');
   const [errorMessage, setErrorMessage] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
-  const {foodcourtImage} = route.params;
+  const {
+    foodcourt_name,
+    foodcourt_address,
+    foodcourt_description,
+    foodcourt_image,
+  } = route.params;
 
   function chooseImage() {
     let options = {
       title: 'Select Image',
-      customButtons: [
-        {name: 'customOptionKey', title: 'Choose Photo from Custom Option'},
-      ],
       storageOptions: {
         skipBackup: true,
         path: 'images',
@@ -142,18 +142,9 @@ function EditProfilePage({route}) {
       } else if (response.customButton) {
         console.log('User tapped custom button: ', response.customButton);
       } else {
-        // const source = { uri: response.uri };
-        // You can also display the image using data:
         const source = {uri: 'data:image/jpeg;base64,' + response.data};
         setFilePath(response);
         setFileData(response.data);
-        console.log('THIS IS FILEDATA', response.data);
-
-        // this.setState({
-        //   filePath: response,
-        //   fileData: response.data,
-        //   fileUri: response.uri
-        // });
       }
     });
   }
@@ -171,8 +162,7 @@ function EditProfilePage({route}) {
     } else {
       return (
         <ButtonKit
-          // source={require('../assets/dummy.png')}
-          source={{uri: 'data:image/jpeg;base64,' + foodcourtImage}}
+          source={{uri: 'data:image/jpeg;base64,' + foodcourt_image}}
           // btnStyle={styles.images}
           wrapperStyle={styles.images}
           onPress={chooseImage}
@@ -208,12 +198,6 @@ function EditProfilePage({route}) {
           image:
             '/9j/4AAQSkZJRgABAQEAYABgAAD//gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2NjIpLCBxdWFsaXR5ID0gODIK/9sAQwAGBAQFBAQGBQUFBgYGBwkOCQkICAkSDQ0KDhUSFhYVEhQUFxohHBcYHxkUFB0nHR8iIyUlJRYcKSwoJCshJCUk/nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn',
         },
-        {
-          auth: {
-            username: 'admin@mail.com',
-            password: 'password',
-          },
-        },
       );
       if (response.data.msg === 'Update foodcourt success') {
         console.log('Update info success');
@@ -224,15 +208,25 @@ function EditProfilePage({route}) {
     }
   }
 
+  const getDataAdmin = async () => {
+    const dataAdmin = await getData('adminData');
+    if (getDataAdmin !== null) {
+      return dataAdmin.foodcourtId;
+    } else {
+      return null;
+    }
+  };
+
   async function getFoodcourtById() {
     setIsLoading(true);
+    const foodcourtId = await getDataAdmin();
     try {
       const response = await axios.get(
-        // 'https://food-planet.herokuapp.com/foodcourts',
-        'http://172.18.0.1:8080/foodcourts',
+        'https://food-planet.herokuapp.com/foodcourts',
+        // 'http://172.18.0.1:8080/foodcourts',
         {
           params: {
-            foodcourtId: 1,
+            foodcourtId: foodcourtId,
           },
           auth: {
             username: 'admin@mail.com',
@@ -260,7 +254,7 @@ function EditProfilePage({route}) {
       {isLoading ? (
         <SpinnerKit sizeSpinner="large" style={styles.spinnerKitStyle} />
       ) : (
-        <ScrollView>
+        <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.headerContainer}>
             <Title text="Edit My Information" />
           </View>
@@ -272,14 +266,14 @@ function EditProfilePage({route}) {
               onChangeText={(text) => onChangeFoodcourtName(text)}
               value={foodcourtName}
               autoCapitalize="none"
-              placeholder={foodcourt.name}
+              placeholder={foodcourt_name}
             />
             <TextInput
               style={styles.textArea}
               onChangeText={(text) => onChangeFoodcourtAddress(text)}
               value={foodcourtAddress}
               autoCapitalize="none"
-              placeholder={foodcourt.address}
+              placeholder={foodcourt_address}
               numberOfLines={4}
               multiline={true}
             />
@@ -288,7 +282,7 @@ function EditProfilePage({route}) {
               onChangeText={(text) => onChangeFoodcourtDesc(text)}
               value={foodcourtDesc}
               autoCapitalize="none"
-              placeholder={foodcourt.description}
+              placeholder={foodcourt_description}
               numberOfLines={4}
               multiline={true}
             />

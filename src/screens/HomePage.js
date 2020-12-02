@@ -40,8 +40,6 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   btnContainer: {
-    borderColor: 'black',
-    borderWidth: 2,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
@@ -95,23 +93,17 @@ function HomePage({navigation}) {
   async function getFoodcourtById() {
     setIsLoading(true);
     const foodcourtId = await getDataAdmin();
-    console.log('FOODCOURT ID: ', foodcourtId);
     try {
       const response = await axios.get(
-        // 'https://food-planet.herokuapp.com/foodcourts',
-        'http://172.18.0.1:8080/foodcourts/searchById/',
+        'https://food-planet.herokuapp.com/foodcourts/searchById',
+        // 'http://172.18.0.1:8080/foodcourts/searchById/',
         {
           params: {
             foodcourtId: foodcourtId,
-          },
-          auth: {
-            username: 'admin@mail.com',
-            password: 'password',
-          },
+          }
         },
       );
       if (response.data.msg === 'Query success') {
-        console.log('DATA: ', response.data.object);
         setFoodcourt(response.data.object);
       }
     } catch (error) {
@@ -141,8 +133,7 @@ function HomePage({navigation}) {
     setIsLoading(true);
     try {
       const response = await axios.post(
-        // 'https://food-planet.herokuapp.com/users/logout',
-        'http://172.18.0.1:8080/users/logout',
+        'https://food-planet.herokuapp.com/users/logout',
       );
       if (response.data.object === 'Logout success') {
         alertMessage({
@@ -205,7 +196,10 @@ function HomePage({navigation}) {
                 source={require('../assets/edit-info.png')}
                 onPress={() => {
                   navigation.navigate('EditProfilePage', {
-                    foodcourtImage: foodcourt.image,
+                    foodcourt_name: foodcourt.name,
+                    foodcourt_address: foodcourt.address,
+                    foodcourt_description: foodcourt.description,
+                    foodcourt_image: foodcourt.image,
                   });
                 }}
               />

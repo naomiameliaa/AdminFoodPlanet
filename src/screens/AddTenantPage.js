@@ -97,7 +97,6 @@ const styles = StyleSheet.create({
 });
 
 function AddTenantPage({navigation}) {
-  const [tenantAdminId, setTenantAdminId] = React.useState('');
   const [tenantEmail, onChangeTenantEmail] = React.useState('');
   const [tenantName, onChangeTenantName] = React.useState('');
   const [tenantDescription, onChangeTenantDescription] = React.useState('');
@@ -117,9 +116,6 @@ function AddTenantPage({navigation}) {
   function chooseImage() {
     let options = {
       title: 'Select Image',
-      customButtons: [
-        {name: 'customOptionKey', title: 'Choose Photo from Custom Option'},
-      ],
       storageOptions: {
         skipBackup: true,
         path: 'images',
@@ -145,13 +141,6 @@ function AddTenantPage({navigation}) {
         const source = {uri: 'data:image/jpeg;base64,' + response.data};
         setFilePath(response);
         setFileData(response.data);
-        console.log('THIS IS FILEDATA', response.data);
-
-        // this.setState({
-        //   filePath: response,
-        //   fileData: response.data,
-        //   fileUri: response.uri
-        // });
       }
     });
   }
@@ -189,15 +178,10 @@ function AddTenantPage({navigation}) {
     const foodcourtId = await getDataAdmin();
     try {
       const response = await axios.get(
-        // `https://food-planet.herokuapp.com/foodcourts/allCategory`,
-        'http://172.18.0.1:8080/foodcourts/allCategory',
+        'https://food-planet.herokuapp.com/foodcourts/allCategory',
         {
           params: {
             foodcourtId: foodcourtId,
-          },
-          auth: {
-            username: 'admin@mail.com',
-            password: 'password',
           },
         },
       );
@@ -213,15 +197,9 @@ function AddTenantPage({navigation}) {
   async function registerTenantAdmin() {
     try {
       const response = await axios.post(
-        'http://172.18.0.1:8080/users/createTenantAdmin',
+        'https://food-planet.herokuapp.com/users/createTenantAdmin',
         {
           email: tenantEmail,
-        },
-        {
-          auth: {
-            username: 'admin@mail.com',
-            password: 'password',
-          },
         },
       );
       if (response.data.msg === 'Create tenantAdmin success') {
@@ -237,8 +215,8 @@ function AddTenantPage({navigation}) {
     const foodcourtId = await getDataAdmin();
     try {
       const response = await axios.post(
-        // 'https://food-planet.herokuapp.com/tenants/generate',
-        'http://172.18.0.1:8080/tenants/generate',
+        'https://food-planet.herokuapp.com/tenants/generate',
+        // 'http://172.18.0.1:8080/tenants/generate',
         {
           userId: tenantAdminId,
           foodcourtId: foodcourtId,
@@ -246,12 +224,6 @@ function AddTenantPage({navigation}) {
           description: tenantDescription,
           category: selectedItems,
           image: fileData,
-        },
-        {
-          auth: {
-            username: 'admin@mail.com',
-            password: 'password',
-          },
         },
       );
       if (response.data.msg === 'Create tenant success') {
