@@ -32,16 +32,11 @@ const styles = StyleSheet.create({
     borderColor: 'red',
     borderWidth: 2,
   },
-  contentContainer: {
-    borderColor: theme.colors.black,
-    borderWidth: 2,
-    // paddingHorizontal: normalize(30),
-  },
+  contentContainer: {},
   boxContainer: {
-    borderColor: theme.colors.black,
-    borderWidth: 2,
     marginBottom: normalize(20),
     flexDirection: 'row',
+    backgroundColor: theme.colors.light_grey,
   },
   titleStyle: {
     fontSize: normalize(24),
@@ -72,8 +67,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   titleTenant: {
-    // borderColor: theme.colors.black,
-    // borderWidth: 2,
     paddingVertical: 5,
     fontWeight: 'bold',
     fontSize: normalize(16),
@@ -82,14 +75,10 @@ const styles = StyleSheet.create({
     marginTop: normalize(80),
   },
   iconStyle: {
-    borderColor: theme.colors.red,
-    borderWidth: 2,
     width: 30,
     height: 30,
   },
   iconContainer: {
-    // borderColor: theme.colors.green,
-    // borderWidth: 2,
     flexDirection: 'row',
     justifyContent: 'space-between',
   },

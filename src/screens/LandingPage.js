@@ -13,7 +13,7 @@ import ButtonText from '../components/ButtonText';
 import Title from '../components/Title';
 import theme from '../theme';
 import {AuthContext} from '../../context';
-import {storeData, alertMessage} from '../utils';
+import {storeData, alertMessage, normalize} from '../utils';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -26,8 +26,11 @@ const styles = StyleSheet.create({
     margin: 20,
     color: theme.colors.red,
   },
-  inputContainer: {
+  contentContainer: {
     alignItems: 'center',
+    backgroundColor: 'grey',
+    borderRadius: normalize(10),
+    padding: normalize(15),
   },
   inputStyle: {
     width: SCREEN_WIDTH * 0.9,
@@ -105,8 +108,8 @@ function LandingPage() {
   }
   return (
     <SafeAreaView style={styles.container}>
-      <Title text="Admin Login" />
-      <View style={styles.inputContainer}>
+      <View style={styles.contentContainer}>
+        <Title text="Login to your account" />
         <TextInput
           style={styles.inputStyle}
           onChangeText={(text) => onChangeEmail(text)}

@@ -15,6 +15,7 @@ import Title from '../components/Title';
 import theme from '../theme';
 import {normalize, getData, removeData, alertMessage} from '../utils';
 import SpinnerKit from '../components/SpinnerKit';
+import {AuthContext} from '../../context';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -39,10 +40,12 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   btnContainer: {
+    borderColor: 'black',
+    borderWidth: 2,
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: normalize(20),
+    marginVertical: normalize(30),
   },
   btnWrapper: {
     flexDirection: 'column',
@@ -85,6 +88,7 @@ const styles = StyleSheet.create({
 
 function HomePage({navigation}) {
   const [foodcourt, setFoodcourt] = React.useState({});
+  const {signOut} = React.useContext(AuthContext);
   const [errorMessage, setErrorMessage] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
 
@@ -117,13 +121,11 @@ function HomePage({navigation}) {
     setIsLoading(false);
   }
 
-  const checkLogout = async () => {
-    const checkAdminData = await getDataAdmin();
-    if (checkAdminData !== null) {
-      await removeData('adminData');
-      logout();
+  const signOutAdmin = async () => {
+    const removeLocalData = await removeData('adminData');
+    if (removeLocalData) {
+      signOut();
     }
-    logout();
   };
 
   const getDataAdmin = async () => {
@@ -148,6 +150,7 @@ function HomePage({navigation}) {
           bodyMessage: 'Logout success!',
           btnText: 'OK',
           btnCancel: false,
+          onPressOK: () => signOutAdmin(),
         });
       }
     } catch (error) {
@@ -173,7 +176,7 @@ function HomePage({navigation}) {
         <View>
           <ButtonText
             title="Log out"
-            onPress={() => checkLogout()}
+            onPress={() => logout()}
             txtStyle={styles.btnTxtLogout}
             wrapperStyle={styles.btnLogoutWrapper}
           />
