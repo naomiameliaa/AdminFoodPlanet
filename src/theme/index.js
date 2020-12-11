@@ -5,10 +5,7 @@ export default {
     off_white: '#FEFEFE',
     white: '#FFFFFF',
     white_background: '#F8F8F8',
-<<<<<<< HEAD
-=======
     white_70: 'rgba(255,255,255,0.6)',
->>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
     black: '#000000',
     light_grey: '#F2F2F2',
     grey: '#AAAAAA',

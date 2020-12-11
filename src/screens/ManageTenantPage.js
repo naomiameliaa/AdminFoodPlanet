@@ -24,31 +24,6 @@ const {width: SCREEN_WIDTH} = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-<<<<<<< HEAD
-    padding: 20,
-  },
-  headerContainer: {
-    flexDirection: 'column',
-    marginVertical: 20,
-    borderColor: 'red',
-    borderWidth: 2,
-  },
-  contentContainer: {
-    borderColor: theme.colors.black,
-    borderWidth: 2,
-    // paddingHorizontal: normalize(30),
-  },
-  boxContainer: {
-    borderColor: theme.colors.black,
-    borderWidth: 2,
-    marginBottom: normalize(20),
-    flexDirection: 'row',
-  },
-  titleStyle: {
-    fontSize: normalize(24),
-  },
-  inputStyle: {
-=======
     padding: normalize(20),
   },
   headerContainer: {
@@ -68,7 +43,6 @@ const styles = StyleSheet.create({
     marginBottom: 0,
   },
   searchStyle: {
->>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
     width: SCREEN_WIDTH * 0.8,
     borderRadius: 10,
     backgroundColor: theme.colors.white,
@@ -78,12 +52,8 @@ const styles = StyleSheet.create({
   },
   searchWrapper: {
     flexDirection: 'row',
-<<<<<<< HEAD
-    marginHorizontal: normalize(20),
-=======
     marginHorizontal: normalize(30),
     marginVertical: normalize(20),
->>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
   },
   iconSearch: {
     height: 22,
@@ -99,11 +69,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
   },
   titleTenant: {
-<<<<<<< HEAD
-    // borderColor: theme.colors.black,
-    // borderWidth: 2,
-=======
->>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
     paddingVertical: 5,
     fontWeight: 'bold',
     fontSize: normalize(16),
@@ -112,36 +77,20 @@ const styles = StyleSheet.create({
     marginTop: normalize(80),
   },
   iconStyle: {
-<<<<<<< HEAD
-    borderColor: theme.colors.red,
-    borderWidth: 2,
-=======
->>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
     width: 30,
     height: 30,
   },
   iconContainer: {
-<<<<<<< HEAD
-    // borderColor: theme.colors.green,
-    // borderWidth: 2,
-=======
->>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
   btnTxtAdd: {
-<<<<<<< HEAD
-    color: theme.colors.red,
-    fontSize: 20,
-    fontWeight: 'bold',
-=======
     color: theme.colors.white,
     backgroundColor: theme.colors.red,
     borderRadius: 10,
     fontSize: 17,
     fontWeight: 'bold',
     padding: 8,
->>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
   },
   btnAddWrapper: {
     width: '30%',
@@ -165,12 +114,7 @@ function ManageTenantPage({navigation}) {
     const foodcourtId = await getDataAdmin();
     try {
       const response = await axios.get(
-<<<<<<< HEAD
-        // 'https://food-planet.herokuapp.com/tenants/foodcourt',
-        'http://172.18.0.1:8080/tenants/foodcourt',
-=======
         'https://food-planet.herokuapp.com/tenants/foodcourt',
->>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
         {
           params: {
             foodcourtId: foodcourtId,
@@ -179,10 +123,6 @@ function ManageTenantPage({navigation}) {
       );
       if (response.data.msg === 'Query success') {
         setTenantData(response.data.object);
-<<<<<<< HEAD
-        console.log('TENANT DATA: ', response.data.object);
-=======
->>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
       }
     } catch (error) {
       setErrorMessage('Something went wrong');
@@ -193,11 +133,7 @@ function ManageTenantPage({navigation}) {
   async function deleteTenant(tenantId) {
     try {
       const response = await axios.delete(
-<<<<<<< HEAD
-        'http://172.18.0.1:8080/tenants/delete',
-=======
         'https://food-planet.herokuapp.com/tenants/delete',
->>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
         {
           params: {
             tenantId: tenantId,
@@ -283,11 +219,7 @@ function ManageTenantPage({navigation}) {
 
   return (
     <SafeAreaView style={styles.container}>
-<<<<<<< HEAD
-      <View>
-=======
       <View style={styles.headerContainer}>
->>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
         <ButtonText
           title="Add Tenant"
           txtStyle={styles.btnTxtAdd}
@@ -297,24 +229,6 @@ function ManageTenantPage({navigation}) {
           }}
         />
       </View>
-<<<<<<< HEAD
-      <View style={styles.headerContainer}>
-        <Title text="Manage Tenants" txtStyle={styles.titleStyle} />
-        <View style={styles.searchWrapper}>
-          <Image
-            style={styles.iconSearch}
-            source={require('../assets/search.png')}
-          />
-          <TextInput
-            style={styles.inputStyle}
-            onChangeText={(text) => onChangeSearchWord(text)}
-            value={searchWord}
-            placeholder="Search Tenant"
-          />
-        </View>
-      </View>
-      <ScrollView contentContainerStyle={styles.contentContainer}>
-=======
       <Title text="Manage Tenants" txtStyle={styles.txtStyle} />
       <View style={styles.searchWrapper}>
         <Image
@@ -329,7 +243,6 @@ function ManageTenantPage({navigation}) {
         />
       </View>
       <ScrollView showsVerticalScrollIndicator={false}>
->>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
         {isLoading ? (
           <SpinnerKit sizeSpinner="large" style={styles.spinnerKitStyle} />
         ) : (
