@@ -4,18 +4,14 @@ import {
   TextInput,
   SafeAreaView,
   StyleSheet,
-  Dimensions,
   ImageBackground,
 } from 'react-native';
 import axios from 'axios';
-import ButtonKit from '../components/ButtonKit';
 import ButtonText from '../components/ButtonText';
 import Title from '../components/Title';
 import theme from '../theme';
 import {AuthContext} from '../../context';
 import {storeData, alertMessage, normalize} from '../utils';
-
-const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   container: {
@@ -28,7 +24,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   contentWrapper: {
-    backgroundColor: theme.colors.white_70,
+    backgroundColor: theme.colors.white_60,
     marginHorizontal: normalize(20),
     padding: normalize(20),
     borderRadius: 20,
@@ -36,22 +32,15 @@ const styles = StyleSheet.create({
   },
   txtTitle: {
     fontSize: normalize(20),
-    color: theme.colors.dark_red,
     alignSelf: 'center',
-  },
-  contentContainer: {
-    alignItems: 'center',
-    backgroundColor: 'grey',
-    borderRadius: normalize(10),
-    padding: normalize(15),
   },
   inputContainer: {
     alignItems: 'center',
   },
   inputStyle: {
     width: '90%',
-    height: normalize(37),
-    borderRadius: 10,
+    height: normalize(40),
+    borderRadius: 20,
     backgroundColor: theme.colors.white,
     fontSize: 18,
     paddingHorizontal: 20,
@@ -72,12 +61,12 @@ const styles = StyleSheet.create({
   },
   forgotPasswordTxt: {
     fontWeight: 'bold',
-    fontSize: 16,
     color: theme.colors.dark_red,
   },
   forgotPasswordWrapper: {
     alignSelf: 'flex-start',
-    marginLeft: normalize(20),
+    marginHorizontal: normalize(20),
+    marginBottom: 10,
   },
 });
 
@@ -85,7 +74,7 @@ function LandingPage({navigation}) {
   const {signIn} = React.useContext(AuthContext);
   const [email, onChangeEmail] = React.useState('');
   const [password, onChangePassword] = React.useState('');
-  const [errorMessage, setErrorMessage] = React.useState('');
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const validationLogin = () => {
     if (email.length === 0 || password.length === 0) {
@@ -101,6 +90,7 @@ function LandingPage({navigation}) {
   };
 
   async function login() {
+    setIsLoading(true);
     try {
       const response = await axios.get(
         'https://food-planet.herokuapp.com/users/login',
@@ -109,7 +99,7 @@ function LandingPage({navigation}) {
             role: 'admin',
           },
           auth: {
-            username: email,
+            username: email.toLowerCase(),
             password: password,
           },
         },
@@ -123,11 +113,11 @@ function LandingPage({navigation}) {
         titleMessage: 'Error',
         bodyMessage: 'Incorrect password or email',
         btnText: 'Try Again',
-        btnCancel: false,
+        btnCancel: true,
       });
-      setErrorMessage('Something went wrong');
       console.log('error:', error);
     }
+    setIsLoading(false);
   }
   return (
     <SafeAreaView style={styles.container}>
@@ -165,6 +155,7 @@ function LandingPage({navigation}) {
               txtStyle={styles.loginTxt}
               wrapperStyle={styles.loginWrapper}
               onPress={validationLogin}
+              isLoading={isLoading}
             />
           </View>
         </View>

@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
 import {
   View,
@@ -50,7 +49,6 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     justifyContent: 'center',
     alignItems: 'center',
-    // marginHorizontal: normalize()
   },
   foodcourtImg: {
     borderRadius: 9,
@@ -88,9 +86,8 @@ const styles = StyleSheet.create({
 });
 
 function HomePage({navigation}) {
-  const [foodcourt, setFoodcourt] = React.useState({});
+  const [foodcourtData, setFoodcourtData] = React.useState([]);
   const {signOut} = React.useContext(AuthContext);
-  const [errorMessage, setErrorMessage] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
 
   async function getFoodcourtById() {
@@ -99,7 +96,6 @@ function HomePage({navigation}) {
     try {
       const response = await axios.get(
         'https://food-planet.herokuapp.com/foodcourts/searchById',
-        // 'http://172.18.0.1:8080/foodcourts/searchById/',
         {
           params: {
             foodcourtId: foodcourtId,
@@ -107,10 +103,9 @@ function HomePage({navigation}) {
         },
       );
       if (response.data.msg === 'Query success') {
-        setFoodcourt(response.data.object);
+        setFoodcourtData(response.data.object);
       }
     } catch (error) {
-      setErrorMessage('Something went wrong');
       console.log('error:', error);
     }
     setIsLoading(false);
@@ -160,6 +155,7 @@ function HomePage({navigation}) {
 
   React.useEffect(() => {
     getFoodcourtById();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
@@ -177,11 +173,11 @@ function HomePage({navigation}) {
           <Title text="Welcome, Admin !" />
           <Image
             style={styles.foodcourtImg}
-            source={{uri: `data:image/jpeg;base64,${foodcourt.image}`}}
+            source={{uri: `data:image/jpeg;base64,${foodcourtData.image}`}}
           />
-          <Text style={styles.titleFoodCourt}>{foodcourt.name}</Text>
-          <Text>{foodcourt.address}</Text>
-          <Text>{foodcourt.description}</Text>
+          <Text style={styles.titleFoodCourt}>{foodcourtData.name}</Text>
+          <Text>{foodcourtData.address}</Text>
+          <Text>{foodcourtData.description}</Text>
           <View style={styles.btnContainer}>
             <View style={styles.btnWrapper}>
               <ButtonKit
@@ -199,10 +195,10 @@ function HomePage({navigation}) {
                 source={require('../assets/edit-info.png')}
                 onPress={() => {
                   navigation.navigate('EditProfilePage', {
-                    foodcourt_name: foodcourt.name,
-                    foodcourt_address: foodcourt.address,
-                    foodcourt_description: foodcourt.description,
-                    foodcourt_image: foodcourt.image,
+                    foodcourt_name: foodcourtData.name,
+                    foodcourt_address: foodcourtData.address,
+                    foodcourt_description: foodcourtData.description,
+                    foodcourt_image: foodcourtData.image,
                   });
                 }}
               />

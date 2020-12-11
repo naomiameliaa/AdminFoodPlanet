@@ -83,7 +83,6 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     height: normalize(190),
->>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
   },
 });
 
