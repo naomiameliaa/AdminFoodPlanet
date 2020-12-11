@@ -20,7 +20,6 @@ const {width: SCREEN_WIDTH} = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    // padding: normalize(30),
   },
   backgroundImg: {
     width: '100%',
@@ -37,6 +36,7 @@ const styles = StyleSheet.create({
   },
   txtTitle: {
     fontSize: normalize(20),
+    color: theme.colors.dark_red,
     alignSelf: 'center',
   },
   contentContainer: {
@@ -70,9 +70,18 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     marginVertical: 10,
   },
+  forgotPasswordTxt: {
+    fontWeight: 'bold',
+    fontSize: 16,
+    color: theme.colors.dark_red,
+  },
+  forgotPasswordWrapper: {
+    alignSelf: 'flex-start',
+    marginLeft: normalize(20),
+  },
 });
 
-function LandingPage() {
+function LandingPage({navigation}) {
   const {signIn} = React.useContext(AuthContext);
   const [email, onChangeEmail] = React.useState('');
   const [password, onChangePassword] = React.useState('');
@@ -144,6 +153,12 @@ function LandingPage() {
               autoCapitalize="none"
               placeholder="Password"
               secureTextEntry={true}
+            />
+            <ButtonText
+              title="Forgot Password ?"
+              txtStyle={styles.forgotPasswordTxt}
+              wrapperStyle={styles.forgotPasswordWrapper}
+              onPress={() => navigation.navigate('ForgotPasswordPage')}
             />
             <ButtonText
               title="LOGIN"

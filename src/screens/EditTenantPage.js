@@ -25,7 +25,7 @@ const {width: SCREEN_WIDTH} = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    margin: 20,
+    margin: normalize(20),
   },
   headerContainer: {
     flexDirection: 'row',
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   txtStyle: {
-    marginRight: 250,
+    marginBottom: 0,
   },
   ImageSections: {
     display: 'flex',
@@ -88,11 +88,8 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   images: {
-    width: 300,
-    height: 200,
-    borderColor: 'black',
-    borderWidth: 1,
-    marginHorizontal: 3,
+    width: SCREEN_WIDTH * 0.9,
+    height: normalize(190),
   },
 });
 
@@ -246,7 +243,7 @@ function EditTenantPage({route, navigation}) {
       ) : (
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.headerContainer}>
-            <Title text="Edit Tenant" />
+            <Title txtStyle={styles.txtStyle} text="Edit Tenant" />
           </View>
           <View style={styles.contentContainer}>
             <View style={styles.ImageSections}>{renderFileData()}</View>

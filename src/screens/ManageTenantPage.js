@@ -24,11 +24,12 @@ const {width: SCREEN_WIDTH} = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
+    padding: normalize(20),
   },
   headerContainer: {
-    flexDirection: 'column',
+    flexDirection: 'row',
     marginBottom: 20,
+    justifyContent: 'flex-end',
     alignItems: 'center',
   },
   contentContainer: {},
@@ -38,10 +39,10 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.light_grey,
     borderRadius: 10,
   },
-  titleStyle: {
-    fontSize: normalize(24),
+  txtStyle: {
+    marginBottom: 0,
   },
-  inputStyle: {
+  searchStyle: {
     width: SCREEN_WIDTH * 0.8,
     borderRadius: 10,
     backgroundColor: theme.colors.white,
@@ -51,7 +52,8 @@ const styles = StyleSheet.create({
   },
   searchWrapper: {
     flexDirection: 'row',
-    marginHorizontal: normalize(20),
+    marginHorizontal: normalize(30),
+    marginVertical: normalize(20),
   },
   iconSearch: {
     height: 22,
@@ -83,9 +85,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   btnTxtAdd: {
-    color: theme.colors.red,
-    fontSize: 20,
+    color: theme.colors.white,
+    backgroundColor: theme.colors.red,
+    borderRadius: 10,
+    fontSize: 17,
     fontWeight: 'bold',
+    padding: 8,
   },
   btnAddWrapper: {
     width: '30%',
@@ -214,7 +219,7 @@ function ManageTenantPage({navigation}) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View>
+      <View style={styles.headerContainer}>
         <ButtonText
           title="Add Tenant"
           txtStyle={styles.btnTxtAdd}
@@ -224,22 +229,20 @@ function ManageTenantPage({navigation}) {
           }}
         />
       </View>
-      <Title text="Manage Tenants" txtStyle={styles.titleStyle} />
-      <View style={styles.headerContainer}>
-        <View style={styles.searchWrapper}>
-          <Image
-            style={styles.iconSearch}
-            source={require('../assets/search.png')}
-          />
-          <TextInput
-            style={styles.inputStyle}
-            onChangeText={(text) => onChangeSearchWord(text)}
-            value={searchWord}
-            placeholder="Search Tenant"
-          />
-        </View>
+      <Title text="Manage Tenants" txtStyle={styles.txtStyle} />
+      <View style={styles.searchWrapper}>
+        <Image
+          style={styles.iconSearch}
+          source={require('../assets/search.png')}
+        />
+        <TextInput
+          style={styles.searchStyle}
+          onChangeText={(text) => onChangeSearchWord(text)}
+          value={searchWord}
+          placeholder="Search Tenant"
+        />
       </View>
-      <ScrollView contentContainerStyle={styles.contentContainer}>
+      <ScrollView showsVerticalScrollIndicator={false}>
         {isLoading ? (
           <SpinnerKit sizeSpinner="large" style={styles.spinnerKitStyle} />
         ) : (

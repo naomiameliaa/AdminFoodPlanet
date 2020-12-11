@@ -25,11 +25,10 @@ const {width: SCREEN_WIDTH} = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    margin: 20,
+    margin: normalize(20),
   },
   headerContainer: {
     flexDirection: 'row',
-    marginVertical: normalize(15),
   },
   contentContainer: {
     justifyContent: 'center',
@@ -78,21 +77,17 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   txtStyle: {
-    marginRight: 250,
+    marginBottom: 0,
   },
   ImageSections: {
     display: 'flex',
     flexDirection: 'row',
-    paddingHorizontal: 8,
     paddingVertical: 8,
     justifyContent: 'center',
   },
   images: {
-    width: 300,
-    height: 200,
-    borderColor: 'black',
-    borderWidth: 1,
-    marginHorizontal: 3,
+    width: SCREEN_WIDTH * 0.9,
+    height: normalize(190),
   },
 });
 

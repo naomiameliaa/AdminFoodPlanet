@@ -7,6 +7,7 @@ import {
   SafeAreaView,
   StyleSheet,
   Dimensions,
+  ScrollView,
 } from 'react-native';
 import axios from 'axios';
 import ButtonKit from '../components/ButtonKit';
@@ -64,14 +65,16 @@ const styles = StyleSheet.create({
     marginTop: normalize(80),
   },
   btnLogoutWrapper: {
-    width: '30%',
     alignSelf: 'flex-end',
-    paddingBottom: 20,
+    paddingBottom: 10,
   },
   btnTxtLogout: {
-    color: theme.colors.red,
-    fontSize: normalize(20),
+    backgroundColor: theme.colors.red,
+    color: theme.colors.white,
+    fontSize: normalize(18),
     fontWeight: 'bold',
+    borderRadius: 10,
+    padding: 10,
   },
   btnStyle: {
     width: normalize(100),
@@ -100,7 +103,7 @@ function HomePage({navigation}) {
         {
           params: {
             foodcourtId: foodcourtId,
-          }
+          },
         },
       );
       if (response.data.msg === 'Query success') {
@@ -164,12 +167,12 @@ function HomePage({navigation}) {
       {isLoading ? (
         <SpinnerKit sizeSpinner="large" style={styles.spinnerKitStyle} />
       ) : (
-        <View>
+        <ScrollView showsVerticalScrollIndicator={false}>
           <ButtonText
             title="Log out"
-            onPress={() => logout()}
             txtStyle={styles.btnTxtLogout}
             wrapperStyle={styles.btnLogoutWrapper}
+            onPress={() => logout()}
           />
           <Title text="Welcome, Admin !" />
           <Image
@@ -206,7 +209,7 @@ function HomePage({navigation}) {
               <Text style={styles.txtStyle}>Edit Foodcourt Information</Text>
             </View>
           </View>
-        </View>
+        </ScrollView>
       )}
     </SafeAreaView>
   );

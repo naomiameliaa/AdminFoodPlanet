@@ -2,6 +2,8 @@ import * as React from 'react';
 import {
   View,
   Text,
+  Image,
+  FlatList,
   TextInput,
   SafeAreaView,
   StyleSheet,
@@ -16,19 +18,19 @@ import theme from '../theme';
 import axios from 'axios';
 import SpinnerKit from '../components/SpinnerKit';
 import ImagePicker from 'react-native-image-picker';
+import DateTimePicker from '@react-native-community/datetimepicker';
+
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
   },
   headerContainer: {
+    flexDirection: 'row',
     marginTop: 20,
     marginHorizontal: 20,
-  },
-  backButton: {
-    marginHorizontal: 10,
-    marginVertical: 5,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   contentContainer: {
     justifyContent: 'center',
@@ -71,9 +73,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   txtStyle: {
-    marginTop: normalize(20),
-    borderColor: theme.colors.black,
-    borderWidth: 2,
+    marginBottom: 0,
   },
   btnChooseImage: {
     width: SCREEN_WIDTH * 0.9,
@@ -97,13 +97,16 @@ const styles = StyleSheet.create({
   },
   images: {
     width: SCREEN_WIDTH * 0.9,
-    height: 150,
-    borderColor: 'black',
-    borderWidth: 1,
+    height: normalize(190),
+    // borderColor: 'black',
+    // borderWidth: 1,
+  },
+  listOpenHourStyle: {
+    flexDirection: 'row',
   },
 });
 
-function EditProfilePage({route}) {
+function EditProfilePage({route, navigation}) {
   const [foodcourt, setFoodcourt] = React.useState([]);
   const [foodcourtName, onChangeFoodcourtName] = React.useState('');
   const [foodcourtAddress, onChangeFoodcourtAddress] = React.useState('');
@@ -118,6 +121,13 @@ function EditProfilePage({route}) {
     foodcourt_description,
     foodcourt_image,
   } = route.params;
+  const [date, setDate] = React.useState(new Date(1598051730000));
+  const [mode, setMode] = React.useState('date');
+  const [show, setShow] = React.useState(false);
+  const onChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setDate(currentDate);
+  };
 
   function chooseImage() {
     let options = {
@@ -223,19 +233,14 @@ function EditProfilePage({route}) {
     try {
       const response = await axios.get(
         'https://food-planet.herokuapp.com/foodcourts',
-        // 'http://172.18.0.1:8080/foodcourts',
         {
           params: {
             foodcourtId: foodcourtId,
           },
-          auth: {
-            username: 'admin@mail.com',
-            password: 'password',
-          },
         },
       );
       if (response.data.msg === 'Query success') {
-        setFoodcourt(response.data.object[0]);
+        setFoodcourt(response.data.object);
       }
     } catch (error) {
       setErrorMessage('Something went wrong');
@@ -256,7 +261,7 @@ function EditProfilePage({route}) {
       ) : (
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.headerContainer}>
-            <Title text="Edit My Information" />
+            <Title txtStyle={styles.txtStyle} text="Edit My Information" />
           </View>
 
           <View style={styles.contentContainer}>
