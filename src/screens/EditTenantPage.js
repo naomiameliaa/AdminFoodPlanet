@@ -25,7 +25,11 @@ const {width: SCREEN_WIDTH} = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+<<<<<<< HEAD
     margin: 20,
+=======
+    margin: normalize(20),
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
   },
   headerContainer: {
     flexDirection: 'row',
@@ -78,7 +82,11 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   txtStyle: {
+<<<<<<< HEAD
     marginRight: 250,
+=======
+    marginBottom: 0,
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
   },
   ImageSections: {
     display: 'flex',
@@ -88,11 +96,16 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   images: {
+<<<<<<< HEAD
     width: 300,
     height: 200,
     borderColor: 'black',
     borderWidth: 1,
     marginHorizontal: 3,
+=======
+    width: SCREEN_WIDTH * 0.9,
+    height: normalize(190),
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
   },
 });
 
@@ -246,7 +259,11 @@ function EditTenantPage({route, navigation}) {
       ) : (
         <ScrollView showsVerticalScrollIndicator={false}>
           <View style={styles.headerContainer}>
+<<<<<<< HEAD
             <Title text="Edit Tenant" />
+=======
+            <Title txtStyle={styles.txtStyle} text="Edit Tenant" />
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
           </View>
           <View style={styles.contentContainer}>
             <View style={styles.ImageSections}>{renderFileData()}</View>
