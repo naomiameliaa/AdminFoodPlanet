@@ -2,13 +2,22 @@ import * as React from 'react';
 import {
   View,
   Text,
+<<<<<<< HEAD
+=======
+  Image,
+  FlatList,
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
   TextInput,
   SafeAreaView,
   StyleSheet,
   Dimensions,
   ScrollView,
 } from 'react-native';
+<<<<<<< HEAD
 import {normalize} from '../utils';
+=======
+import {getData, normalize} from '../utils';
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
 import ButtonText from '../components/ButtonText';
 import ButtonKit from '../components/ButtonKit';
 import Title from '../components/Title';
@@ -16,10 +25,16 @@ import theme from '../theme';
 import axios from 'axios';
 import SpinnerKit from '../components/SpinnerKit';
 import ImagePicker from 'react-native-image-picker';
+<<<<<<< HEAD
+=======
+import DateTimePicker from '@react-native-community/datetimepicker';
+
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+<<<<<<< HEAD
     padding: 20,
   },
   headerContainer: {
@@ -29,13 +44,25 @@ const styles = StyleSheet.create({
   backButton: {
     marginHorizontal: 10,
     marginVertical: 5,
+=======
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    marginTop: 20,
+    marginHorizontal: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
   },
   contentContainer: {
     justifyContent: 'center',
     alignItems: 'center',
     marginVertical: normalize(20),
+<<<<<<< HEAD
     borderColor: theme.colors.black,
     borderWidth: 2,
+=======
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
   },
   inputStyle: {
     width: SCREEN_WIDTH * 0.9,
@@ -73,9 +100,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
   },
   txtStyle: {
+<<<<<<< HEAD
     marginTop: normalize(20),
     borderColor: theme.colors.black,
     borderWidth: 2,
+=======
+    marginBottom: 0,
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
   },
   btnChooseImage: {
     width: SCREEN_WIDTH * 0.9,
@@ -99,6 +130,7 @@ const styles = StyleSheet.create({
   },
   images: {
     width: SCREEN_WIDTH * 0.9,
+<<<<<<< HEAD
     height: 150,
     borderColor: 'black',
     borderWidth: 1,
@@ -106,6 +138,18 @@ const styles = StyleSheet.create({
 });
 
 function EditProfilePage({route}) {
+=======
+    height: normalize(190),
+    // borderColor: 'black',
+    // borderWidth: 1,
+  },
+  listOpenHourStyle: {
+    flexDirection: 'row',
+  },
+});
+
+function EditProfilePage({route, navigation}) {
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
   const [foodcourt, setFoodcourt] = React.useState([]);
   const [foodcourtName, onChangeFoodcourtName] = React.useState('');
   const [foodcourtAddress, onChangeFoodcourtAddress] = React.useState('');
@@ -114,14 +158,33 @@ function EditProfilePage({route}) {
   const [filePath, setFilePath] = React.useState('');
   const [errorMessage, setErrorMessage] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
+<<<<<<< HEAD
   const {foodcourtImage} = route.params;
+=======
+  const {
+    foodcourt_name,
+    foodcourt_address,
+    foodcourt_description,
+    foodcourt_image,
+  } = route.params;
+  const [date, setDate] = React.useState(new Date(1598051730000));
+  const [mode, setMode] = React.useState('date');
+  const [show, setShow] = React.useState(false);
+  const onChange = (event, selectedDate) => {
+    const currentDate = selectedDate || date;
+    setDate(currentDate);
+  };
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
 
   function chooseImage() {
     let options = {
       title: 'Select Image',
+<<<<<<< HEAD
       customButtons: [
         {name: 'customOptionKey', title: 'Choose Photo from Custom Option'},
       ],
+=======
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
       storageOptions: {
         skipBackup: true,
         path: 'images',
@@ -142,6 +205,7 @@ function EditProfilePage({route}) {
       } else if (response.customButton) {
         console.log('User tapped custom button: ', response.customButton);
       } else {
+<<<<<<< HEAD
         // const source = { uri: response.uri };
         // You can also display the image using data:
         const source = {uri: 'data:image/jpeg;base64,' + response.data};
@@ -154,6 +218,11 @@ function EditProfilePage({route}) {
         //   fileData: response.data,
         //   fileUri: response.uri
         // });
+=======
+        const source = {uri: 'data:image/jpeg;base64,' + response.data};
+        setFilePath(response);
+        setFileData(response.data);
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
       }
     });
   }
@@ -171,8 +240,12 @@ function EditProfilePage({route}) {
     } else {
       return (
         <ButtonKit
+<<<<<<< HEAD
           // source={require('../assets/dummy.png')}
           source={{uri: 'data:image/jpeg;base64,' + foodcourtImage}}
+=======
+          source={{uri: 'data:image/jpeg;base64,' + foodcourt_image}}
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
           // btnStyle={styles.images}
           wrapperStyle={styles.images}
           onPress={chooseImage}
@@ -208,12 +281,15 @@ function EditProfilePage({route}) {
           image:
             '/9j/4AAQSkZJRgABAQEAYABgAAD//gA7Q1JFQVRPUjogZ2QtanBlZyB2MS4wICh1c2luZyBJSkcgSlBFRyB2NjIpLCBxdWFsaXR5ID0gODIK/9sAQwAGBAQFBAQGBQUFBgYGBwkOCQkICAkSDQ0KDhUSFhYVEhQUFxohHBcYHxkUFB0nHR8iIyUlJRYcKSwoJCshJCUk/nnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnnn',
         },
+<<<<<<< HEAD
         {
           auth: {
             username: 'admin@mail.com',
             password: 'password',
           },
         },
+=======
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
       );
       if (response.data.msg === 'Update foodcourt success') {
         console.log('Update info success');
@@ -224,6 +300,7 @@ function EditProfilePage({route}) {
     }
   }
 
+<<<<<<< HEAD
   async function getFoodcourtById() {
     setIsLoading(true);
     try {
@@ -237,11 +314,35 @@ function EditProfilePage({route}) {
           auth: {
             username: 'admin@mail.com',
             password: 'password',
+=======
+  const getDataAdmin = async () => {
+    const dataAdmin = await getData('adminData');
+    if (getDataAdmin !== null) {
+      return dataAdmin.foodcourtId;
+    } else {
+      return null;
+    }
+  };
+
+  async function getFoodcourtById() {
+    setIsLoading(true);
+    const foodcourtId = await getDataAdmin();
+    try {
+      const response = await axios.get(
+        'https://food-planet.herokuapp.com/foodcourts',
+        {
+          params: {
+            foodcourtId: foodcourtId,
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
           },
         },
       );
       if (response.data.msg === 'Query success') {
+<<<<<<< HEAD
         setFoodcourt(response.data.object[0]);
+=======
+        setFoodcourt(response.data.object);
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
       }
     } catch (error) {
       setErrorMessage('Something went wrong');
@@ -260,9 +361,15 @@ function EditProfilePage({route}) {
       {isLoading ? (
         <SpinnerKit sizeSpinner="large" style={styles.spinnerKitStyle} />
       ) : (
+<<<<<<< HEAD
         <ScrollView>
           <View style={styles.headerContainer}>
             <Title text="Edit My Information" />
+=======
+        <ScrollView showsVerticalScrollIndicator={false}>
+          <View style={styles.headerContainer}>
+            <Title txtStyle={styles.txtStyle} text="Edit My Information" />
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
           </View>
 
           <View style={styles.contentContainer}>
@@ -272,14 +379,22 @@ function EditProfilePage({route}) {
               onChangeText={(text) => onChangeFoodcourtName(text)}
               value={foodcourtName}
               autoCapitalize="none"
+<<<<<<< HEAD
               placeholder={foodcourt.name}
+=======
+              placeholder={foodcourt_name}
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
             />
             <TextInput
               style={styles.textArea}
               onChangeText={(text) => onChangeFoodcourtAddress(text)}
               value={foodcourtAddress}
               autoCapitalize="none"
+<<<<<<< HEAD
               placeholder={foodcourt.address}
+=======
+              placeholder={foodcourt_address}
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
               numberOfLines={4}
               multiline={true}
             />
@@ -288,7 +403,11 @@ function EditProfilePage({route}) {
               onChangeText={(text) => onChangeFoodcourtDesc(text)}
               value={foodcourtDesc}
               autoCapitalize="none"
+<<<<<<< HEAD
               placeholder={foodcourt.description}
+=======
+              placeholder={foodcourt_description}
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
               numberOfLines={4}
               multiline={true}
             />

@@ -25,11 +25,18 @@ const {width: SCREEN_WIDTH} = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+<<<<<<< HEAD
     margin: 20,
   },
   headerContainer: {
     flexDirection: 'row',
     marginVertical: normalize(15),
+=======
+    margin: normalize(20),
+  },
+  headerContainer: {
+    flexDirection: 'row',
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
   },
   contentContainer: {
     justifyContent: 'center',
@@ -78,26 +85,41 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   txtStyle: {
+<<<<<<< HEAD
     marginRight: 250,
+=======
+    marginBottom: 0,
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
   },
   ImageSections: {
     display: 'flex',
     flexDirection: 'row',
+<<<<<<< HEAD
     paddingHorizontal: 8,
+=======
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
     paddingVertical: 8,
     justifyContent: 'center',
   },
   images: {
+<<<<<<< HEAD
     width: 300,
     height: 200,
     borderColor: 'black',
     borderWidth: 1,
     marginHorizontal: 3,
+=======
+    width: SCREEN_WIDTH * 0.9,
+    height: normalize(190),
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
   },
 });
 
 function AddTenantPage({navigation}) {
+<<<<<<< HEAD
   const [tenantAdminId, setTenantAdminId] = React.useState('');
+=======
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
   const [tenantEmail, onChangeTenantEmail] = React.useState('');
   const [tenantName, onChangeTenantName] = React.useState('');
   const [tenantDescription, onChangeTenantDescription] = React.useState('');
@@ -117,9 +139,12 @@ function AddTenantPage({navigation}) {
   function chooseImage() {
     let options = {
       title: 'Select Image',
+<<<<<<< HEAD
       customButtons: [
         {name: 'customOptionKey', title: 'Choose Photo from Custom Option'},
       ],
+=======
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
       storageOptions: {
         skipBackup: true,
         path: 'images',
@@ -145,6 +170,7 @@ function AddTenantPage({navigation}) {
         const source = {uri: 'data:image/jpeg;base64,' + response.data};
         setFilePath(response);
         setFileData(response.data);
+<<<<<<< HEAD
         console.log('THIS IS FILEDATA', response.data);
 
         // this.setState({
@@ -152,6 +178,8 @@ function AddTenantPage({navigation}) {
         //   fileData: response.data,
         //   fileUri: response.uri
         // });
+=======
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
       }
     });
   }
@@ -189,16 +217,23 @@ function AddTenantPage({navigation}) {
     const foodcourtId = await getDataAdmin();
     try {
       const response = await axios.get(
+<<<<<<< HEAD
         // `https://food-planet.herokuapp.com/foodcourts/allCategory`,
         'http://172.18.0.1:8080/foodcourts/allCategory',
+=======
+        'https://food-planet.herokuapp.com/foodcourts/allCategory',
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
         {
           params: {
             foodcourtId: foodcourtId,
           },
+<<<<<<< HEAD
           auth: {
             username: 'admin@mail.com',
             password: 'password',
           },
+=======
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
         },
       );
       if (response.data.msg === 'Query success') {
@@ -213,6 +248,7 @@ function AddTenantPage({navigation}) {
   async function registerTenantAdmin() {
     try {
       const response = await axios.post(
+<<<<<<< HEAD
         'http://172.18.0.1:8080/users/createTenantAdmin',
         {
           email: tenantEmail,
@@ -223,6 +259,12 @@ function AddTenantPage({navigation}) {
             password: 'password',
           },
         },
+=======
+        'https://food-planet.herokuapp.com/users/createTenantAdmin',
+        {
+          email: tenantEmail,
+        },
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
       );
       if (response.data.msg === 'Create tenantAdmin success') {
         return response.data.object.userId;
@@ -237,8 +279,13 @@ function AddTenantPage({navigation}) {
     const foodcourtId = await getDataAdmin();
     try {
       const response = await axios.post(
+<<<<<<< HEAD
         // 'https://food-planet.herokuapp.com/tenants/generate',
         'http://172.18.0.1:8080/tenants/generate',
+=======
+        'https://food-planet.herokuapp.com/tenants/generate',
+        // 'http://172.18.0.1:8080/tenants/generate',
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
         {
           userId: tenantAdminId,
           foodcourtId: foodcourtId,
@@ -247,12 +294,15 @@ function AddTenantPage({navigation}) {
           category: selectedItems,
           image: fileData,
         },
+<<<<<<< HEAD
         {
           auth: {
             username: 'admin@mail.com',
             password: 'password',
           },
         },
+=======
+>>>>>>> 5269fca4381fbf5f3846c33d5fdd6d2b885c0d0e
       );
       if (response.data.msg === 'Create tenant success') {
         console.log('add new tenant: ', tenantAdminId);
