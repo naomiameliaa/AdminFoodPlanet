@@ -12,6 +12,7 @@ import EditProfilePage from './src/screens/EditProfilePage';
 import AddTenantPage from './src/screens/AddTenantPage';
 import EditTenantPage from './src/screens/EditTenantPage';
 import ForgotPasswordPage from './src/screens/ForgotPasswordPage';
+import ChangePasswordPage from './src/screens/ChangePasswordPage';
 
 const AuthStack = createStackNavigator();
 const AuthStackScreen = () => (
@@ -51,6 +52,11 @@ function HomeStackScreen() {
       <HomeStack.Screen
         name="EditProfilePage"
         component={EditProfilePage}
+        options={{headerShown: false}}
+      />
+      <HomeStack.Screen
+        name="ChangePasswordPage"
+        component={ChangePasswordPage}
         options={{headerShown: false}}
       />
       <HomeStack.Screen

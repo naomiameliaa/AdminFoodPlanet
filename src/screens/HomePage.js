@@ -6,7 +6,7 @@ import {
   SafeAreaView,
   StyleSheet,
   Dimensions,
-  ScrollView,
+  TouchableOpacity,
 } from 'react-native';
 import axios from 'axios';
 import ButtonKit from '../components/ButtonKit';
@@ -24,9 +24,34 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 20,
   },
-  txtTitle: {
-    margin: 20,
+  innerContainer: {
+    padding: normalize(20),
+  },
+  btnLogoutWrapper: {
+    alignSelf: 'flex-end',
+  },
+  btnTxtLogout: {
     color: theme.colors.red,
+    fontSize: normalize(18),
+    fontWeight: 'bold',
+  },
+  titleStyle: {
+    fontSize: normalize(20),
+    marginTop: normalize(20),
+  },
+  foodcourtImg: {
+    borderRadius: 10,
+    width: '100%',
+    height: 200,
+  },
+  titleFoodCourt: {
+    fontSize: normalize(16),
+    fontWeight: 'bold',
+    marginTop: normalize(10),
+    marginBottom: normalize(5),
+  },
+  txtStyle: {
+    marginBottom: 3,
   },
   buttonText: {
     color: theme.colors.white,
@@ -40,48 +65,30 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   btnContainer: {
+    width: '100%',
+    height: 120,
     flexDirection: 'row',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    marginVertical: normalize(30),
+    marginVertical: normalize(40),
   },
   btnWrapper: {
-    flexDirection: 'column',
+    width: '30%',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  foodcourtImg: {
-    borderRadius: 9,
-    width: '100%',
-    height: 200,
+  btnStyle: {
+    width: '70%',
+    height: '70%',
+    marginBottom: 8,
   },
-  titleFoodCourt: {
-    fontSize: normalize(16),
+  btnText: {
+    fontSize: normalize(10),
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   spinnerKitStyle: {
     marginTop: normalize(80),
-  },
-  btnLogoutWrapper: {
-    alignSelf: 'flex-end',
-    paddingBottom: 10,
-  },
-  btnTxtLogout: {
-    backgroundColor: theme.colors.red,
-    color: theme.colors.white,
-    fontSize: normalize(18),
-    fontWeight: 'bold',
-    borderRadius: 10,
-    padding: 10,
-  },
-  btnStyle: {
-    width: normalize(100),
-    height: normalize(100),
-    margin: 20,
-  },
-  txtStyle: {
-    fontWeight: 'bold',
-    fontSize: 17,
   },
 });
 
@@ -107,6 +114,13 @@ function HomePage({navigation}) {
       }
     } catch (error) {
       console.log('error:', error);
+      alertMessage({
+        titleMessage: 'Session Timeout',
+        bodyMessage: 'Please re-login',
+        btnText: 'OK',
+        onPressOK: () => signOutAdmin(),
+        btnCancel: false,
+      });
     }
     setIsLoading(false);
   }
@@ -120,7 +134,7 @@ function HomePage({navigation}) {
 
   const getDataAdmin = async () => {
     const dataAdmin = await getData('adminData');
-    if (getDataAdmin !== null) {
+    if (dataAdmin) {
       return dataAdmin.foodcourtId;
     } else {
       return null;
@@ -163,49 +177,69 @@ function HomePage({navigation}) {
       {isLoading ? (
         <SpinnerKit sizeSpinner="large" style={styles.spinnerKitStyle} />
       ) : (
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <View style={styles.innerContainer}>
           <ButtonText
             title="Log out"
             txtStyle={styles.btnTxtLogout}
             wrapperStyle={styles.btnLogoutWrapper}
             onPress={() => logout()}
           />
-          <Title text="Welcome, Admin !" />
+          <Title text="Welcome, Admin!" txtStyle={styles.titleStyle} />
           <Image
             style={styles.foodcourtImg}
             source={{uri: `data:image/jpeg;base64,${foodcourtData.image}`}}
           />
-          <Text style={styles.titleFoodCourt}>{foodcourtData.name}</Text>
-          <Text>{foodcourtData.address}</Text>
-          <Text>{foodcourtData.description}</Text>
-          <View style={styles.btnContainer}>
-            <View style={styles.btnWrapper}>
-              <ButtonKit
-                wrapperStyle={styles.btnStyle}
-                source={require('../assets/settings-gears.png')}
-                onPress={() => {
-                  navigation.navigate('ManageTenantPage');
-                }}
-              />
-              <Text style={styles.txtStyle}>Manage Tenant</Text>
-            </View>
-            <View style={styles.btnWrapper}>
-              <ButtonKit
-                wrapperStyle={styles.btnStyle}
-                source={require('../assets/edit-info.png')}
-                onPress={() => {
-                  navigation.navigate('EditProfilePage', {
-                    foodcourt_name: foodcourtData.name,
-                    foodcourt_address: foodcourtData.address,
-                    foodcourt_description: foodcourtData.description,
-                    foodcourt_image: foodcourtData.image,
-                  });
-                }}
-              />
-              <Text style={styles.txtStyle}>Edit Foodcourt Information</Text>
-            </View>
+          <View style={styles.detailContainer}>
+            <Text style={styles.titleFoodCourt} numberOfLines={1}>
+              {foodcourtData.name}
+            </Text>
+            <Text style={styles.txtStyle}>{foodcourtData.address}</Text>
+            <Text style={styles.txtStyle}>{foodcourtData.description}</Text>
           </View>
-        </ScrollView>
+          <View style={styles.btnContainer}>
+            <TouchableOpacity
+              style={styles.btnWrapper}
+              onPress={() => {
+                navigation.navigate('ManageTenantPage');
+              }}>
+              <Image
+                style={styles.btnStyle}
+                source={require('../assets/settings-gears.png')}
+                resizeMode="contain"
+              />
+              <Text style={styles.btnText}>Manage Tenant</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.btnWrapper}
+              onPress={() => {
+                navigation.navigate('EditProfilePage', {
+                  foodcourt_name: foodcourtData.name,
+                  foodcourt_address: foodcourtData.address,
+                  foodcourt_description: foodcourtData.description,
+                  foodcourt_image: foodcourtData.image,
+                });
+              }}>
+              <Image
+                style={styles.btnStyle}
+                source={require('../assets/edit-info.png')}
+                resizeMode="contain"
+              />
+              <Text style={styles.btnText}>Edit Foodcourt Information</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.btnWrapper}
+              onPress={() => {
+                navigation.navigate('ChangePasswordPage');
+              }}>
+              <Image
+                style={styles.btnStyle}
+                source={require('../assets/padlock.png')}
+                resizeMode="contain"
+              />
+              <Text style={styles.btnText}>Change Password</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       )}
     </SafeAreaView>
   );
