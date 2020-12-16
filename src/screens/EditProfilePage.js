@@ -7,7 +7,7 @@ import {
   TextInput,
   SafeAreaView,
   StyleSheet,
-  Dimensions,
+  Platform,
   ScrollView,
 } from 'react-native';
 import {getData, normalize} from '../utils';
@@ -139,6 +139,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: 'bold',
     color: theme.colors.dark_grey,
+    backgroundColor: 'red',
   },
   btnHour: {
     width: '50%',
@@ -170,6 +171,7 @@ function EditProfilePage({route, navigation}) {
   const [fileData, setFileData] = React.useState(foodcourt_image);
   const [isLoading, setIsLoading] = React.useState(false);
   const [date, setDate] = React.useState(new Date());
+  const [time, setTime] = React.useState(new Date());
   const [show, setShow] = React.useState(false);
   // const onChange = (event, selectedDate) => {
   //   const currentDate = selectedDate || date;
@@ -220,6 +222,18 @@ function EditProfilePage({route, navigation}) {
     }
   }
 
+  const onChange = (event, selectedValue) => {
+    setShow(Platform.OS === 'ios');
+    const currentDate = selectedValue || new Date();
+    setDate(currentDate);
+    setTime(currentDate);
+  };
+
+  const formatDate = (times) => {
+    return `${String(times.getHours()).padStart(2, '0')}:
+    ${String(times.getMinutes()).padStart(2, '0')}`;
+  };
+
   async function updateFoodcourt() {
     try {
       const response = await axios.put(
@@ -253,19 +267,6 @@ function EditProfilePage({route, navigation}) {
       console.log('error:', error);
     }
   }
-  const renderDateTimePicker = () => {
-    console.log('render date time');
-    return (
-      <DateTimePicker
-        testID="dateTimePicker"
-        value={date}
-        mode={'time'}
-        is24Hour={true}
-        display="default"
-        onChange={(dates) => setDate(dates)}
-      />
-    );
-  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -314,10 +315,10 @@ function EditProfilePage({route, navigation}) {
                 <Text style={styles.dayStyle}>Monday</Text>
                 <View style={styles.innerHorizontalWrapper}>
                   <ButtonText
-                    title="Choose Open Hour"
+                    title={formatDate(time)}
                     txtStyle={styles.txtBtnHour}
                     wrapperStyle={styles.btnHour}
-                    onPress={() => renderDateTimePicker()}
+                    onPress={() => setShow(true)}
                   />
                   <ButtonText
                     title="Choose Close Hour"
@@ -426,6 +427,15 @@ function EditProfilePage({route, navigation}) {
             onPress={updateFoodcourt}
             isLoading={isLoading}
           />
+          {show && (
+            <DateTimePicker
+              value={time}
+              mode={'time'}
+              is24Hour={true}
+              display="default"
+              onChange={onChange}
+            />
+          )}
         </ScrollView>
       </View>
     </SafeAreaView>

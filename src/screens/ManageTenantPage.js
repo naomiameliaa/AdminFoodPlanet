@@ -24,7 +24,9 @@ const {width: SCREEN_WIDTH} = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: normalize(20),
+  },
+  innerContainer: {
+    padding: normalize(10),
   },
   headerContainer: {
     flexDirection: 'row',
@@ -219,40 +221,42 @@ function ManageTenantPage({navigation}) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.headerContainer}>
-        <ButtonText
-          title="Add Tenant"
-          txtStyle={styles.btnTxtAdd}
-          wrapperStyle={styles.btnAddWrapper}
-          onPress={() => {
-            navigation.navigate('AddTenantPage');
-          }}
-        />
-      </View>
-      <Title text="Manage Tenants" txtStyle={styles.txtStyle} />
-      <View style={styles.searchWrapper}>
-        <Image
-          style={styles.iconSearch}
-          source={require('../assets/search.png')}
-        />
-        <TextInput
-          style={styles.searchStyle}
-          onChangeText={(text) => onChangeSearchWord(text)}
-          value={searchWord}
-          placeholder="Search Tenant"
-        />
-      </View>
-      <ScrollView showsVerticalScrollIndicator={false}>
-        {isLoading ? (
-          <SpinnerKit sizeSpinner="large" style={styles.spinnerKitStyle} />
-        ) : (
-          <FlatList
-            data={tenantData}
-            renderItem={({item, index}) => renderItem({item, index})}
-            keyExtractor={(item) => item.tenantId.toString()}
+      <View style={styles.innerContainer}>
+        <View style={styles.headerContainer}>
+          <ButtonText
+            title="Add Tenant"
+            txtStyle={styles.btnTxtAdd}
+            wrapperStyle={styles.btnAddWrapper}
+            onPress={() => {
+              navigation.navigate('AddTenantPage');
+            }}
           />
-        )}
-      </ScrollView>
+        </View>
+        <Title text="Manage Tenants" txtStyle={styles.txtStyle} />
+        <View style={styles.searchWrapper}>
+          <Image
+            style={styles.iconSearch}
+            source={require('../assets/search.png')}
+          />
+          <TextInput
+            style={styles.searchStyle}
+            onChangeText={(text) => onChangeSearchWord(text)}
+            value={searchWord}
+            placeholder="Search Tenant"
+          />
+        </View>
+        <ScrollView showsVerticalScrollIndicator={false}>
+          {isLoading ? (
+            <SpinnerKit sizeSpinner="large" style={styles.spinnerKitStyle} />
+          ) : (
+            <FlatList
+              data={tenantData}
+              renderItem={({item, index}) => renderItem({item, index})}
+              keyExtractor={(item) => item.tenantId.toString()}
+            />
+          )}
+        </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
