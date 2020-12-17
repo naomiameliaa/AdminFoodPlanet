@@ -22,13 +22,13 @@ const {width: SCREEN_WIDTH} = Dimensions.get('window');
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
   },
   innerContainer: {
-    padding: normalize(20),
+    padding: normalize(10),
   },
   btnLogoutWrapper: {
     alignSelf: 'flex-end',
+    height: '5%',
   },
   btnTxtLogout: {
     color: theme.colors.red,
@@ -96,6 +96,7 @@ function HomePage({navigation}) {
   const [foodcourtData, setFoodcourtData] = React.useState([]);
   const {signOut} = React.useContext(AuthContext);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [isLoadingLogout, setIsLoadingLogout] = React.useState(false);
 
   async function getFoodcourtById() {
     setIsLoading(true);
@@ -142,7 +143,7 @@ function HomePage({navigation}) {
   };
 
   async function logout() {
-    setIsLoading(true);
+    setIsLoadingLogout(true);
     try {
       const response = await axios.post(
         'https://food-planet.herokuapp.com/users/logout',
@@ -164,7 +165,7 @@ function HomePage({navigation}) {
         btnCancel: false,
       });
     }
-    setIsLoading(false);
+    setIsLoadingLogout(false);
   }
 
   React.useEffect(() => {
@@ -183,6 +184,8 @@ function HomePage({navigation}) {
             txtStyle={styles.btnTxtLogout}
             wrapperStyle={styles.btnLogoutWrapper}
             onPress={() => logout()}
+            isLoading={isLoadingLogout}
+            colorSpinner={theme.colors.red}
           />
           <Title text="Welcome, Admin!" txtStyle={styles.titleStyle} />
           <Image

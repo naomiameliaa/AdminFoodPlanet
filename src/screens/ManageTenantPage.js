@@ -7,7 +7,6 @@ import {
   TextInput,
   SafeAreaView,
   StyleSheet,
-  Dimensions,
   ScrollView,
   FlatList,
 } from 'react-native';
@@ -19,14 +18,12 @@ import theme from '../theme';
 import axios from 'axios';
 import SpinnerKit from '../components/SpinnerKit';
 
-const {width: SCREEN_WIDTH} = Dimensions.get('window');
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
   innerContainer: {
-    padding: normalize(10),
+    padding: normalize(20),
   },
   headerContainer: {
     flexDirection: 'row',
@@ -34,28 +31,32 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     alignItems: 'center',
   },
-  contentContainer: {},
-  boxContainer: {
-    marginBottom: normalize(20),
-    flexDirection: 'row',
-    backgroundColor: theme.colors.light_grey,
-    borderRadius: 10,
+  btnTxtAdd: {
+    color: theme.colors.red,
+    fontSize: 20,
+    fontWeight: 'bold',
   },
-  txtStyle: {
-    marginBottom: 0,
+  btnAddWrapper: {
+    alignSelf: 'flex-end',
+    paddingHorizontal: 8,
+  },
+  titleText: {
+    fontSize: normalize(22),
+  },
+  searchWrapper: {
+    width: '100%',
+    flexDirection: 'row',
+    marginRight: -normalize(35),
+    alignSelf: 'center',
+    marginBottom: normalize(20),
   },
   searchStyle: {
-    width: SCREEN_WIDTH * 0.8,
+    width: '100%',
     borderRadius: 10,
-    backgroundColor: theme.colors.white,
+    borderWidth: 1,
     fontSize: 18,
     paddingHorizontal: normalize(50),
     height: 45,
-  },
-  searchWrapper: {
-    flexDirection: 'row',
-    marginHorizontal: normalize(30),
-    marginVertical: normalize(20),
   },
   iconSearch: {
     height: 22,
@@ -64,16 +65,22 @@ const styles = StyleSheet.create({
     marginRight: -normalize(35),
     zIndex: 1,
   },
+  boxContainer: {
+    marginBottom: normalize(10),
+    flexDirection: 'row',
+    backgroundColor: theme.colors.white_background,
+    borderRadius: 10,
+    padding: 10,
+  },
   imgTenantStyle: {
-    width: 70,
-    height: 70,
+    width: '30%',
+    height: 100,
     marginRight: 20,
-    borderRadius: 5,
   },
   titleTenant: {
-    paddingVertical: 5,
+    marginVertical: 8,
     fontWeight: 'bold',
-    fontSize: normalize(16),
+    fontSize: normalize(18),
   },
   spinnerKitStyle: {
     marginTop: normalize(80),
@@ -83,28 +90,16 @@ const styles = StyleSheet.create({
     height: 30,
   },
   iconContainer: {
+    width: '68%',
     flexDirection: 'row',
     justifyContent: 'space-between',
-  },
-  btnTxtAdd: {
-    color: theme.colors.white,
-    backgroundColor: theme.colors.red,
-    borderRadius: 10,
-    fontSize: 17,
-    fontWeight: 'bold',
-    padding: 8,
-  },
-  btnAddWrapper: {
-    width: '30%',
-    alignSelf: 'flex-end',
+    marginVertical: 10,
   },
 });
 
 function ManageTenantPage({navigation}) {
   const [tenantData, setTenantData] = React.useState(null);
   const [searchWord, onChangeSearchWord] = React.useState('');
-
-  const [errorMessage, setErrorMessage] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
 
   React.useEffect(() => {
@@ -127,7 +122,7 @@ function ManageTenantPage({navigation}) {
         setTenantData(response.data.object);
       }
     } catch (error) {
-      setErrorMessage('Something went wrong');
+      console.log(error);
     }
     setIsLoading(false);
   }
@@ -176,16 +171,18 @@ function ManageTenantPage({navigation}) {
         <Image
           style={styles.imgTenantStyle}
           source={{uri: `data:image/jpeg;base64,${item.image}`}}
+          resizeMode="contain"
         />
         <View>
-          <Text style={styles.titleTenant}>{item.name}</Text>
+          <Text style={styles.titleTenant} numberOfLines={1}>
+            {item.name}
+          </Text>
           <View style={styles.iconContainer}>
             <ButtonKit
               btnStyle={styles.iconStyle}
-              source={require('../assets/view-icon.png')}
+              source={require('../assets/view-red.png')}
               onPress={() =>
                 navigation.navigate('TenantDetailPage', {
-                  tenantId: item.tenantId,
                   tenantName: item.name,
                   tenantDescription: item.description,
                   tenantCategory: item.category,
@@ -196,7 +193,7 @@ function ManageTenantPage({navigation}) {
             />
             <ButtonKit
               btnStyle={styles.iconStyle}
-              source={require('../assets/edit.png')}
+              source={require('../assets/edit-red.png')}
               onPress={() => {
                 navigation.navigate('EditTenantPage', {
                   tenantId: item.tenantId,
@@ -204,13 +201,12 @@ function ManageTenantPage({navigation}) {
                   tenantDescription: item.description,
                   tenantCategory: item.category,
                   tenantImage: item.image,
-                  tenantRating: item.rating,
                 });
               }}
             />
             <ButtonKit
               btnStyle={styles.iconStyle}
-              source={require('../assets/delete-icon.png')}
+              source={require('../assets/trash-red.png')}
               onPress={() => remove(item.tenantId)}
             />
           </View>
@@ -222,17 +218,15 @@ function ManageTenantPage({navigation}) {
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.innerContainer}>
-        <View style={styles.headerContainer}>
-          <ButtonText
-            title="Add Tenant"
-            txtStyle={styles.btnTxtAdd}
-            wrapperStyle={styles.btnAddWrapper}
-            onPress={() => {
-              navigation.navigate('AddTenantPage');
-            }}
-          />
-        </View>
-        <Title text="Manage Tenants" txtStyle={styles.txtStyle} />
+        <ButtonText
+          title="Add Tenant"
+          txtStyle={styles.btnTxtAdd}
+          wrapperStyle={styles.btnAddWrapper}
+          onPress={() => {
+            navigation.navigate('AddTenantPage');
+          }}
+        />
+        <Title text="Manage Tenants" txtStyle={styles.titleText} />
         <View style={styles.searchWrapper}>
           <Image
             style={styles.iconSearch}

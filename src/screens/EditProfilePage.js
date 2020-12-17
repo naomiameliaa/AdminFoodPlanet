@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   innerContainer: {
-    padding: normalize(10),
+    padding: normalize(20),
     paddingBottom: normalize(80),
   },
   titleText: {
@@ -68,11 +68,6 @@ const styles = StyleSheet.create({
     marginVertical: 8,
     textAlignVertical: 'top',
   },
-  imageSections: {
-    paddingHorizontal: 8,
-    paddingVertical: 8,
-    justifyContent: 'center',
-  },
   btnImage: {
     alignSelf: 'flex-end',
     zIndex: 1,
@@ -90,8 +85,6 @@ const styles = StyleSheet.create({
   images: {
     width: '100%',
     height: 220,
-    borderColor: 'black',
-    borderWidth: 0.5,
     borderRadius: 20,
   },
   inputContainer: {
@@ -139,7 +132,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: 'bold',
     color: theme.colors.dark_grey,
-    backgroundColor: 'red',
   },
   btnHour: {
     width: '50%',
@@ -153,6 +145,9 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
 });
+
+const defaultTime =
+  'Wed Dec 16 2020 00:00:00 GMT+0700 (Western Indonesia Time)';
 
 function EditProfilePage({route, navigation}) {
   const {
@@ -173,6 +168,23 @@ function EditProfilePage({route, navigation}) {
   const [date, setDate] = React.useState(new Date());
   const [time, setTime] = React.useState(new Date());
   const [show, setShow] = React.useState(false);
+  const [section, setSection] = React.useState([]);
+  const listOpenCloseHour = {
+    openHour: defaultTime,
+    closeHour: defaultTime,
+  };
+  const [openingHourList, setOpeningHourList] = React.useState([
+    {
+      day: '1',
+      ...listOpenCloseHour,
+    },
+    {day: '2', ...listOpenCloseHour},
+    {day: '3', ...listOpenCloseHour},
+    {day: '4', ...listOpenCloseHour},
+    {day: '5', ...listOpenCloseHour},
+    {day: '6', ...listOpenCloseHour},
+    {day: '7', ...listOpenCloseHour},
+  ]);
   // const onChange = (event, selectedDate) => {
   //   const currentDate = selectedDate || date;
   //   setDate(currentDate);
@@ -208,7 +220,6 @@ function EditProfilePage({route, navigation}) {
         <Image
           source={{uri: 'data:image/jpeg;base64,' + fileData}}
           style={styles.images}
-          resizeMode="contain"
         />
       );
     } else {
@@ -216,25 +227,64 @@ function EditProfilePage({route, navigation}) {
         <Image
           source={{uri: 'data:image/jpeg;base64,' + foodcourt_image}}
           style={styles.images}
-          resizeMode="contain"
         />
       );
     }
   }
 
   const onChange = (event, selectedValue) => {
-    setShow(Platform.OS === 'ios');
+    setShow(false);
     const currentDate = selectedValue || new Date();
-    setDate(currentDate);
-    setTime(currentDate);
+    let obj = [];
+    // setTime(currentDate);
+    if (section[0] === 1 && section[1] === 1) {
+      obj = [...openingHourList, (openingHourList[0].openHour = currentDate)];
+    } else if (section[0] === 1 && section[1] === 2) {
+      obj = [...openingHourList, (openingHourList[0].closeHour = currentDate)];
+    } else if (section[0] === 2 && section[1] === 1) {
+      obj = [...openingHourList, (openingHourList[1].openHour = currentDate)];
+    } else if (section[0] === 2 && section[1] === 2) {
+      obj = [...openingHourList, (openingHourList[1].closeHour = currentDate)];
+    } else if (section[0] === 3 && section[1] === 1) {
+      obj = [...openingHourList, (openingHourList[2].openHour = currentDate)];
+    } else if (section[0] === 3 && section[1] === 2) {
+      obj = [...openingHourList, (openingHourList[2].closeHour = currentDate)];
+    } else if (section[0] === 4 && section[1] === 1) {
+      obj = [...openingHourList, (openingHourList[3].openHour = currentDate)];
+    } else if (section[0] === 4 && section[1] === 2) {
+      obj = [...openingHourList, (openingHourList[3].closeHour = currentDate)];
+    } else if (section[0] === 5 && section[1] === 1) {
+      obj = [...openingHourList, (openingHourList[4].openHour = currentDate)];
+    } else if (section[0] === 5 && section[1] === 2) {
+      obj = [...openingHourList, (openingHourList[4].closeHour = currentDate)];
+    } else if (section[0] === 6 && section[1] === 1) {
+      obj = [...openingHourList, (openingHourList[5].openHour = currentDate)];
+    } else if (section[0] === 6 && section[1] === 2) {
+      obj = [...openingHourList, (openingHourList[5].closeHour = currentDate)];
+    } else if (section[0] === 7 && section[1] === 1) {
+      obj = [...openingHourList, (openingHourList[6].openHour = currentDate)];
+    } else if (section[0] === 7 && section[1] === 2) {
+      obj = [...openingHourList, (openingHourList[6].closeHour = currentDate)];
+    }
+    setOpeningHourList(obj);
   };
 
-  const formatDate = (times) => {
-    return `${String(times.getHours()).padStart(2, '0')}:
-    ${String(times.getMinutes()).padStart(2, '0')}`;
+  const formatDate = (params) => {
+    const times = new Date(params);
+    // eslint-disable-next-line prettier/prettier
+    return `${String(times.getHours()).padStart(2, '0')}:${String(times.getMinutes()).padStart(2, '0')}`;
   };
 
   async function updateFoodcourt() {
+    let bodyOpeningHour = [];
+    openingHourList.forEach((item, index) => {
+      const tempObj = {
+        ...item,
+        openHour: formatDate(item.openHour),
+        closeHour: formatDate(item.closeHour),
+      };
+      bodyOpeningHour.push(tempObj);
+    });
     try {
       const response = await axios.put(
         'https://food-planet.herokuapp.com/foodcourts',
@@ -243,15 +293,7 @@ function EditProfilePage({route, navigation}) {
           name: foodcourtName,
           address: foodcourtAddress,
           description: foodcourtDesc,
-          openingHourList: [
-            {day: '1', openHour: '09:00', closeHour: '18:00'},
-            {day: '2', openHour: '09:00', closeHour: '18:00'},
-            {day: '3', openHour: '09:00', closeHour: '18:00'},
-            {day: '4', openHour: '09:00', closeHour: '18:00'},
-            {day: '5', openHour: '09:00', closeHour: '18:00'},
-            {day: '6', openHour: '09:00', closeHour: '18:00'},
-            {day: '7', openHour: '09:00', closeHour: '18:00'},
-          ],
+          openingHourList: bodyOpeningHour,
           seats: {
             2: 20,
             4: 15,
@@ -268,12 +310,17 @@ function EditProfilePage({route, navigation}) {
     }
   }
 
+  const setSectionDay = (sectionDay) => {
+    setSection(sectionDay);
+    setShow(true);
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.innerContainer}>
         <Title txtStyle={styles.titleText} text="Edit My Information" />
         <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={styles.ImageSections}>{renderFileData()}</View>
+          <View>{renderFileData()}</View>
           <ButtonKit
             source={require('../assets/photo.png')}
             wrapperStyle={styles.btnImage}
@@ -315,15 +362,16 @@ function EditProfilePage({route, navigation}) {
                 <Text style={styles.dayStyle}>Monday</Text>
                 <View style={styles.innerHorizontalWrapper}>
                   <ButtonText
-                    title={formatDate(time)}
+                    title={formatDate(openingHourList[0].openHour)}
                     txtStyle={styles.txtBtnHour}
                     wrapperStyle={styles.btnHour}
-                    onPress={() => setShow(true)}
+                    onPress={() => setSectionDay([1, 1])}
                   />
                   <ButtonText
-                    title="Choose Close Hour"
+                    title={formatDate(openingHourList[0].closeHour)}
                     txtStyle={styles.txtBtnHour}
                     wrapperStyle={styles.btnHour}
+                    onPress={() => setSectionDay([1, 2])}
                   />
                 </View>
               </View>
@@ -331,14 +379,16 @@ function EditProfilePage({route, navigation}) {
                 <Text style={styles.dayStyle}>Tuesday</Text>
                 <View style={styles.innerHorizontalWrapper}>
                   <ButtonText
-                    title="Choose Open Hour"
+                    title={formatDate(openingHourList[1].openHour)}
                     txtStyle={styles.txtBtnHour}
                     wrapperStyle={styles.btnHour}
+                    onPress={() => setSectionDay([2, 1])}
                   />
                   <ButtonText
-                    title="Choose Close Hour"
+                    title={formatDate(openingHourList[1].closeHour)}
                     txtStyle={styles.txtBtnHour}
                     wrapperStyle={styles.btnHour}
+                    onPress={() => setSectionDay([2, 2])}
                   />
                 </View>
               </View>
@@ -346,14 +396,16 @@ function EditProfilePage({route, navigation}) {
                 <Text style={styles.dayStyle}>Wednesday</Text>
                 <View style={styles.innerHorizontalWrapper}>
                   <ButtonText
-                    title="Choose Open Hour"
+                    title={formatDate(openingHourList[2].openHour)}
                     txtStyle={styles.txtBtnHour}
                     wrapperStyle={styles.btnHour}
+                    onPress={() => setSectionDay([3, 1])}
                   />
                   <ButtonText
-                    title="Choose Close Hour"
+                    title={formatDate(openingHourList[2].closeHour)}
                     txtStyle={styles.txtBtnHour}
                     wrapperStyle={styles.btnHour}
+                    onPress={() => setSectionDay([3, 2])}
                   />
                 </View>
               </View>
@@ -361,14 +413,16 @@ function EditProfilePage({route, navigation}) {
                 <Text style={styles.dayStyle}>Thursday</Text>
                 <View style={styles.innerHorizontalWrapper}>
                   <ButtonText
-                    title="Choose Open Hour"
+                    title={formatDate(openingHourList[3].openHour)}
                     txtStyle={styles.txtBtnHour}
                     wrapperStyle={styles.btnHour}
+                    onPress={() => setSectionDay([4, 1])}
                   />
                   <ButtonText
-                    title="Choose Close Hour"
+                    title={formatDate(openingHourList[3].closeHour)}
                     txtStyle={styles.txtBtnHour}
                     wrapperStyle={styles.btnHour}
+                    onPress={() => setSectionDay([4, 2])}
                   />
                 </View>
               </View>
@@ -376,14 +430,16 @@ function EditProfilePage({route, navigation}) {
                 <Text style={styles.dayStyle}>Friday</Text>
                 <View style={styles.innerHorizontalWrapper}>
                   <ButtonText
-                    title="Choose Open Hour"
+                    title={formatDate(openingHourList[4].openHour)}
                     txtStyle={styles.txtBtnHour}
                     wrapperStyle={styles.btnHour}
+                    onPress={() => setSectionDay([5, 1])}
                   />
                   <ButtonText
-                    title="Choose Close Hour"
+                    title={formatDate(openingHourList[4].closeHour)}
                     txtStyle={styles.txtBtnHour}
                     wrapperStyle={styles.btnHour}
+                    onPress={() => setSectionDay([5, 2])}
                   />
                 </View>
               </View>
@@ -391,14 +447,16 @@ function EditProfilePage({route, navigation}) {
                 <Text style={styles.dayStyle}>Saturday</Text>
                 <View style={styles.innerHorizontalWrapper}>
                   <ButtonText
-                    title="Choose Open Hour"
+                    title={formatDate(openingHourList[5].openHour)}
                     txtStyle={styles.txtBtnHour}
                     wrapperStyle={styles.btnHour}
+                    onPress={() => setSectionDay([6, 1])}
                   />
                   <ButtonText
-                    title="Choose Close Hour"
+                    title={formatDate(openingHourList[5].closeHour)}
                     txtStyle={styles.txtBtnHour}
                     wrapperStyle={styles.btnHour}
+                    onPress={() => setSectionDay([6, 2])}
                   />
                 </View>
               </View>
@@ -406,14 +464,16 @@ function EditProfilePage({route, navigation}) {
                 <Text style={styles.dayStyle}>Sunday</Text>
                 <View style={styles.innerHorizontalWrapper}>
                   <ButtonText
-                    title="Choose Open Hour"
+                    title={formatDate(openingHourList[6].openHour)}
                     txtStyle={styles.txtBtnHour}
                     wrapperStyle={styles.btnHour}
+                    onPress={() => setSectionDay([7, 1])}
                   />
                   <ButtonText
-                    title="Choose Close Hour"
+                    title={formatDate(openingHourList[6].closeHour)}
                     txtStyle={styles.txtBtnHour}
                     wrapperStyle={styles.btnHour}
+                    onPress={() => setSectionDay([7, 2])}
                   />
                 </View>
               </View>

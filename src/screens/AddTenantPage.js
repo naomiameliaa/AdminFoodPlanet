@@ -2,12 +2,10 @@
 import * as React from 'react';
 import {
   View,
-  Text,
   Image,
   TextInput,
   SafeAreaView,
   StyleSheet,
-  Dimensions,
   ScrollView,
 } from 'react-native';
 import {normalize, getData, alertMessage} from '../utils';
@@ -16,73 +14,83 @@ import ButtonKit from '../components/ButtonKit';
 import Title from '../components/Title';
 import theme from '../theme';
 import axios from 'axios';
-import SpinnerKit from '../components/SpinnerKit';
 import MultiSelect from 'react-native-multiple-select';
 import ImagePicker from 'react-native-image-picker';
-
-const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    margin: normalize(20),
   },
-  headerContainer: {
-    flexDirection: 'row',
+  innerContainer: {
+    padding: normalize(20),
+  },
+  titleText: {
+    fontSize: normalize(22),
+    marginTop: 15,
+    marginBottom: 25,
   },
   contentContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: normalize(20),
+    top: -normalize(20),
   },
-  multiSelectContainer: {
-    marginVertical: normalize(10),
+  btnImage: {
+    alignSelf: 'flex-end',
+    zIndex: 1,
+    top: -normalize(40),
+    marginHorizontal: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: theme.colors.white,
+    padding: 5,
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    opacity: 0.6,
   },
   inputStyle: {
-    width: SCREEN_WIDTH * 0.9,
+    width: '100%',
+    height: 40,
     borderRadius: 10,
     backgroundColor: theme.colors.white,
     fontSize: 18,
     paddingHorizontal: 20,
-    marginVertical: 10,
+    marginVertical: 8,
     justifyContent: 'center',
+  },
+  textArea: {
+    width: '100%',
+    height: 120,
+    borderRadius: 10,
+    backgroundColor: theme.colors.white,
+    fontSize: 18,
+    paddingHorizontal: 20,
+    marginTop: 8,
+    textAlignVertical: 'top',
+  },
+  multiSelectStyle: {
+    borderRadius: 10,
+  },
+  btnText: {
+    color: theme.colors.white,
+    fontSize: normalize(18),
+    fontWeight: 'bold',
   },
   btnWrapper: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginVertical: normalize(20),
-  },
-  btnSubmit: {
     backgroundColor: theme.colors.red,
-    width: SCREEN_WIDTH * 0.6,
+    width: '50%',
     borderRadius: 10,
-    paddingVertical: 12,
-    marginVertical: 10,
-  },
-  txtSubmit: {
-    color: theme.colors.white,
-    fontSize: 18,
-  },
-  btnChooseImage: {
-    width: SCREEN_WIDTH * 0.9,
-    borderRadius: 10,
-    paddingVertical: 12,
-    marginVertical: 10,
-    borderColor: theme.colors.black,
-    borderWidth: 2,
-  },
-  txtChooseImage: {
-    color: theme.colors.black,
-    fontSize: 18,
-    marginVertical: 10,
+    paddingVertical: 8,
+    marginTop: 30,
+    alignSelf: 'center',
   },
   txtStyle: {
     marginBottom: 0,
   },
-  ImageSections: {
-    display: 'flex',
-    flexDirection: 'row',
-    height: normalize(190),
+  images: {
+    width: '100%',
+    height: 220,
+    borderRadius: 20,
   },
 });
 
@@ -93,32 +101,25 @@ function AddTenantPage({navigation}) {
   const [selectedItems, setSelectedItems] = React.useState([]);
   const [listCategory, setListCategory] = React.useState([]);
   const [fileData, setFileData] = React.useState('');
-  const [filePath, setFilePath] = React.useState('');
+  const [isLoading, setIsLoading] = React.useState(false);
 
-  const [errorMessage, setErrorMessage] = React.useState('');
-  const [isLoading] = React.useState(false);
-
+  // eslint-disable-next-line no-shadow
   const onSelectedItemsChange = (selectedItems) => {
     setSelectedItems(selectedItems);
-    console.log(selectedItems);
   };
 
   function chooseImage() {
     let options = {
       title: 'Select Image',
+      customButtons: [
+        {name: 'customOptionKey', title: 'Choose Photo from Custom Option'},
+      ],
       storageOptions: {
         skipBackup: true,
         path: 'images',
       },
     };
-
-    /**
-     * The first arg is the options object for customization (it can also be null or omitted for default options),
-     * The second arg is the callback which sends object: response (more info in the API Reference)
-     */
     ImagePicker.showImagePicker(options, (response) => {
-      console.log('Response = ', response);
-
       if (response.didCancel) {
         console.log('User cancelled image picker');
       } else if (response.error) {
@@ -126,10 +127,6 @@ function AddTenantPage({navigation}) {
       } else if (response.customButton) {
         console.log('User tapped custom button: ', response.customButton);
       } else {
-        // const source = { uri: response.uri };
-        // You can also display the image using data:
-        const source = {uri: 'data:image/jpeg;base64,' + response.data};
-        setFilePath(response);
         setFileData(response.data);
       }
     });
@@ -138,19 +135,14 @@ function AddTenantPage({navigation}) {
   function renderFileData() {
     if (fileData) {
       return (
-        <ButtonKit
+        <Image
           source={{uri: 'data:image/jpeg;base64,' + fileData}}
-          wrapperStyle={styles.images}
-          onPress={chooseImage}
+          style={styles.images}
         />
       );
     } else {
       return (
-        <ButtonKit
-          source={require('../assets/dummy.png')}
-          wrapperStyle={styles.images}
-          onPress={chooseImage}
-        />
+        <Image source={require('../assets/dummy.png')} style={styles.images} />
       );
     }
   }
@@ -180,7 +172,7 @@ function AddTenantPage({navigation}) {
         setListCategory(response.data.object);
       }
     } catch (error) {
-      setErrorMessage('Something went wrong');
+      console.log(error);
     }
   }
 
@@ -206,7 +198,6 @@ function AddTenantPage({navigation}) {
     try {
       const response = await axios.post(
         'https://food-planet.herokuapp.com/tenants/generate',
-        // 'http://172.18.0.1:8080/tenants/generate',
         {
           userId: tenantAdminId,
           foodcourtId: foodcourtId,
@@ -227,8 +218,6 @@ function AddTenantPage({navigation}) {
         });
       }
     } catch (error) {
-      setErrorMessage('Something went wrong');
-      console.log(tenantAdminId);
       console.log(error);
       alertMessage({
         titleMessage: 'Error',
@@ -245,15 +234,16 @@ function AddTenantPage({navigation}) {
 
   return (
     <SafeAreaView style={styles.container}>
-      {isLoading ? (
-        <SpinnerKit sizeSpinner="large" style={styles.spinnerKitStyle} />
-      ) : (
+      <View style={styles.innerContainer}>
+        <Title txtStyle={styles.titleText} text="Add New Tenant" />
         <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={styles.headerContainer}>
-            <Title text="Add New Tenant" />
-          </View>
+          {renderFileData()}
+          <ButtonKit
+            source={require('../assets/photo.png')}
+            wrapperStyle={styles.btnImage}
+            onPress={chooseImage}
+          />
           <View style={styles.contentContainer}>
-            <View style={styles.ImageSections}>{renderFileData()}</View>
             <TextInput
               style={styles.inputStyle}
               onChangeText={(text) => onChangeTenantEmail(text)}
@@ -269,46 +259,41 @@ function AddTenantPage({navigation}) {
               placeholder="Tenant Name"
             />
             <TextInput
-              style={styles.inputStyle}
+              style={styles.textArea}
               onChangeText={(text) => onChangeTenantDescription(text)}
               value={tenantDescription}
               autoCapitalize="none"
               placeholder="Tenant Description"
             />
           </View>
-          <View style={styles.multiSelectContainer}>
-            <MultiSelect
-              hideTags
-              items={listCategory}
-              uniqueKey="categoryName"
-              onSelectedItemsChange={onSelectedItemsChange}
-              selectedItems={selectedItems}
-              selectText="-- Select Category --"
-              searchInputPlaceholderText="Search Category"
-              onChangeInput={(text) => console.log(text)}
-              tagRemoveIconColor="#CCC"
-              tagBorderColor="#CCC"
-              tagTextColor="#CCC"
-              selectedItemTextColor="#CCC"
-              selectedItemIconColor="#CCC"
-              itemTextColor="#000"
-              displayKey="categoryName"
-              searchInputStyle={{color: '#CCC', fontSize: 18}}
-              submitButtonColor="#48d22b"
-              submitButtonText="OK"
-              fontSize={18}
-            />
-          </View>
-          <View style={styles.btnWrapper}>
-            <ButtonText
-              title="Submit"
-              txtStyle={styles.txtSubmit}
-              wrapperStyle={styles.btnSubmit}
-              onPress={addNewTenant}
-            />
-          </View>
+          <MultiSelect
+            items={listCategory}
+            uniqueKey="categoryName"
+            onSelectedItemsChange={onSelectedItemsChange}
+            selectedItems={selectedItems}
+            selectText="    -- Select Category --"
+            searchInputPlaceholderText="Search Category"
+            onChangeInput={(text) => console.log(text)}
+            tagRemoveIconColor={theme.colors.red}
+            tagBorderColor={theme.colors.grey}
+            tagTextColor={theme.colors.black}
+            selectedItemTextColor={theme.colors.red}
+            selectedItemIconColor={theme.colors.green}
+            itemTextColor={theme.colors.black}
+            displayKey="categoryName"
+            searchInputStyle={styles.multiSelectStyle}
+            submitButtonColor={theme.colors.red}
+            submitButtonText="OK"
+            fontSize={18}
+          />
+          <ButtonText
+            title="Submit"
+            txtStyle={styles.btnText}
+            wrapperStyle={styles.btnWrapper}
+            onPress={addNewTenant}
+          />
         </ScrollView>
-      )}
+      </View>
     </SafeAreaView>
   );
 }

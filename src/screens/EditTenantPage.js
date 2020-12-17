@@ -2,12 +2,10 @@
 import * as React from 'react';
 import {
   View,
-  Text,
   Image,
   TextInput,
   SafeAreaView,
   StyleSheet,
-  Dimensions,
   ScrollView,
 } from 'react-native';
 import {normalize, getData, alertMessage} from '../utils';
@@ -16,98 +14,103 @@ import ButtonKit from '../components/ButtonKit';
 import Title from '../components/Title';
 import theme from '../theme';
 import axios from 'axios';
-import SpinnerKit from '../components/SpinnerKit';
 import MultiSelect from 'react-native-multiple-select';
 import ImagePicker from 'react-native-image-picker';
-
-const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    margin: normalize(20),
   },
-  headerContainer: {
-    flexDirection: 'row',
-    marginVertical: normalize(15),
+  innerContainer: {
+    padding: normalize(20),
+  },
+  titleText: {
+    fontSize: normalize(22),
+    marginTop: 15,
+    marginBottom: 25,
   },
   contentContainer: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: normalize(20),
+    top: -normalize(20),
   },
-  multiSelectContainer: {
-    marginVertical: normalize(10),
+  btnImage: {
+    alignSelf: 'flex-end',
+    zIndex: 1,
+    top: -normalize(40),
+    marginHorizontal: 10,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: theme.colors.white,
+    padding: 5,
+    width: 40,
+    height: 40,
+    borderRadius: 10,
+    opacity: 0.6,
   },
   inputStyle: {
-    width: SCREEN_WIDTH * 0.9,
+    width: '100%',
+    height: 40,
     borderRadius: 10,
     backgroundColor: theme.colors.white,
     fontSize: 18,
     paddingHorizontal: 20,
-    marginVertical: 10,
+    marginVertical: 8,
     justifyContent: 'center',
+  },
+  textArea: {
+    width: '100%',
+    height: 120,
+    borderRadius: 10,
+    backgroundColor: theme.colors.white,
+    fontSize: 18,
+    paddingHorizontal: 20,
+    marginTop: 8,
+    textAlignVertical: 'top',
+  },
+  multiSelectStyle: {
+    borderRadius: 10,
+  },
+  btnText: {
+    color: theme.colors.white,
+    fontSize: normalize(18),
+    fontWeight: 'bold',
   },
   btnWrapper: {
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginVertical: normalize(20),
-  },
-  btnSubmit: {
     backgroundColor: theme.colors.red,
-    width: SCREEN_WIDTH * 0.6,
+    width: '50%',
     borderRadius: 10,
-    paddingVertical: 12,
-    marginVertical: 10,
-  },
-  txtSubmit: {
-    color: theme.colors.white,
-    fontSize: 18,
-  },
-  btnChooseImage: {
-    width: SCREEN_WIDTH * 0.9,
-    borderRadius: 10,
-    paddingVertical: 12,
-    marginVertical: 10,
-    borderColor: theme.colors.black,
-    borderWidth: 2,
-  },
-  txtChooseImage: {
-    color: theme.colors.black,
-    fontSize: 18,
-    marginVertical: 10,
-  },
-  txtStyle: {
-    marginBottom: 0,
-  },
-  ImageSections: {
-    display: 'flex',
-    flexDirection: 'row',
-    paddingHorizontal: 8,
     paddingVertical: 8,
-    justifyContent: 'center',
+    marginTop: 30,
+    alignSelf: 'center',
   },
   images: {
-    width: SCREEN_WIDTH * 0.9,
-    height: normalize(190),
+    width: '100%',
+    height: 220,
+    borderRadius: 20,
   },
 });
 
 function EditTenantPage({route, navigation}) {
-  const [tenant_name, onChangeTenantName] = React.useState('');
-  const [tenant_description, onChangeTenantDescription] = React.useState('');
-  const [selectedItems, setSelectedItems] = React.useState([]);
+  const {
+    tenantId,
+    tenantName,
+    tenantDescription,
+    tenantCategory,
+    tenantImage,
+  } = route.params;
+  const [tenant_name, onChangeTenantName] = React.useState(tenantName);
+  const [tenant_description, onChangeTenantDescription] = React.useState(
+    tenantDescription,
+  );
+  const [selectedItems, setSelectedItems] = React.useState(tenantCategory);
   const [listCategory, setListCategory] = React.useState([]);
   const [fileData, setFileData] = React.useState('');
-  const [filePath, setFilePath] = React.useState('');
-  const {tenantId, tenantName, tenantDescription, tenantImage} = route.params;
+  const [isLoading, setIsLoading] = React.useState(false);
 
-  const [errorMessage, setErrorMessage] = React.useState('');
-  const [isLoading] = React.useState(false);
-
+  // eslint-disable-next-line no-shadow
   const onSelectedItemsChange = (selectedItems) => {
     setSelectedItems(selectedItems);
-    console.log(selectedItems);
   };
 
   function chooseImage() {
@@ -121,9 +124,7 @@ function EditTenantPage({route, navigation}) {
         path: 'images',
       },
     };
-
     ImagePicker.showImagePicker(options, (response) => {
-      console.log('Response = ', response);
       if (response.didCancel) {
         console.log('User cancelled image picker');
       } else if (response.error) {
@@ -131,10 +132,7 @@ function EditTenantPage({route, navigation}) {
       } else if (response.customButton) {
         console.log('User tapped custom button: ', response.customButton);
       } else {
-        const source = {uri: 'data:image/jpeg;base64,' + response.data};
-        setFilePath(response);
         setFileData(response.data);
-        console.log('THIS IS FILEDATA', response.data);
       }
     });
   }
@@ -142,18 +140,16 @@ function EditTenantPage({route, navigation}) {
   function renderFileData() {
     if (fileData) {
       return (
-        <ButtonKit
+        <Image
           source={{uri: 'data:image/jpeg;base64,' + fileData}}
-          wrapperStyle={styles.images}
-          onPress={chooseImage}
+          style={styles.images}
         />
       );
     } else {
       return (
-        <ButtonKit
+        <Image
           source={{uri: 'data:image/jpeg;base64,' + tenantImage}}
-          wrapperStyle={styles.images}
-          onPress={chooseImage}
+          style={styles.images}
         />
       );
     }
@@ -172,32 +168,21 @@ function EditTenantPage({route, navigation}) {
     const foodcourtId = await getDataAdmin();
     try {
       const response = await axios.get(
-        // `https://food-planet.herokuapp.com/foodcourts/allCategory`,
-        'http://172.18.0.1:8080/foodcourts/allCategory',
-        {
-          params: {
-            foodcourtId: foodcourtId,
-          },
-          auth: {
-            username: 'admin@mail.com',
-            password: 'password',
-          },
-        },
+        `https://food-planet.herokuapp.com/foodcourts/allCategory?foodcourtId=${foodcourtId}`,
       );
       if (response.data.msg === 'Query success') {
-        console.log(response.data.object);
         setListCategory(response.data.object);
       }
     } catch (error) {
-      setErrorMessage('Something went wrong');
+      console.log(error);
     }
   }
 
   async function editTenant() {
+    setIsLoading(true);
     try {
       const response = await axios.post(
-        // 'https://food-planet.herokuapp.com/tenants/generate',
-        'http://172.18.0.1:8080/tenants/update',
+        'https://food-planet.herokuapp.com/tenants/update ',
         {
           tenantId: tenantId,
           name: tenantName,
@@ -215,21 +200,22 @@ function EditTenantPage({route, navigation}) {
       if (response.data.msg === 'Update tenant success') {
         alertMessage({
           titleMessage: 'Success',
-          bodyMessage: 'Success update tenant',
+          bodyMessage: 'Success Update Tenant',
           btnText: 'OK',
           onPressOK: () => navigation.goBack(),
           btnCancel: false,
         });
       }
     } catch (error) {
-      setErrorMessage('Something went wrong');
+      console.log(error);
       alertMessage({
         titleMessage: 'Error',
-        bodyMessage: 'Update tenant failed',
+        bodyMessage: 'Failed Update Tenant',
         btnText: 'Try Again',
         btnCancel: false,
       });
     }
+    setIsLoading(false);
   }
 
   React.useEffect(() => {
@@ -238,63 +224,60 @@ function EditTenantPage({route, navigation}) {
 
   return (
     <SafeAreaView style={styles.container}>
-      {isLoading ? (
-        <SpinnerKit sizeSpinner="large" style={styles.spinnerKitStyle} />
-      ) : (
+      <View style={styles.innerContainer}>
+        <Title txtStyle={styles.titleText} text="Edit Tenant" />
         <ScrollView showsVerticalScrollIndicator={false}>
-          <View style={styles.headerContainer}>
-            <Title txtStyle={styles.txtStyle} text="Edit Tenant" />
-          </View>
+          {renderFileData()}
+          <ButtonKit
+            source={require('../assets/photo.png')}
+            wrapperStyle={styles.btnImage}
+            onPress={chooseImage}
+          />
           <View style={styles.contentContainer}>
-            <View style={styles.ImageSections}>{renderFileData()}</View>
             <TextInput
               style={styles.inputStyle}
               onChangeText={(text) => onChangeTenantName(text)}
               value={tenant_name}
               autoCapitalize="none"
-              placeholder={tenantName}
+              placeholder="Tenant Name"
             />
             <TextInput
-              style={styles.inputStyle}
+              style={styles.textArea}
               onChangeText={(text) => onChangeTenantDescription(text)}
               value={tenant_description}
               autoCapitalize="none"
-              placeholder={tenantDescription}
+              placeholder="Tenant Description"
             />
           </View>
-          <View style={styles.multiSelectContainer}>
-            <MultiSelect
-              hideTags
-              items={listCategory}
-              uniqueKey="categoryName"
-              onSelectedItemsChange={onSelectedItemsChange}
-              selectedItems={selectedItems}
-              selectText="-- Select Category --"
-              searchInputPlaceholderText="Search Category"
-              onChangeInput={(text) => console.log(text)}
-              tagRemoveIconColor="#CCC"
-              tagBorderColor="#CCC"
-              tagTextColor="#CCC"
-              selectedItemTextColor="#CCC"
-              selectedItemIconColor="#CCC"
-              itemTextColor="#000"
-              displayKey="categoryName"
-              searchInputStyle={{color: '#CCC', fontSize: 18}}
-              submitButtonColor="#48d22b"
-              submitButtonText="OK"
-              fontSize={18}
-            />
-          </View>
-          <View style={styles.btnWrapper}>
-            <ButtonText
-              title="Submit"
-              txtStyle={styles.txtSubmit}
-              wrapperStyle={styles.btnSubmit}
-              onPress={editTenant}
-            />
-          </View>
+          <MultiSelect
+            items={listCategory}
+            uniqueKey="categoryName"
+            onSelectedItemsChange={onSelectedItemsChange}
+            selectedItems={selectedItems}
+            selectText="    -- Select Category --"
+            searchInputPlaceholderText="Search Category"
+            onChangeInput={(text) => console.log(text)}
+            tagRemoveIconColor={theme.colors.red}
+            tagBorderColor={theme.colors.grey}
+            tagTextColor={theme.colors.black}
+            selectedItemTextColor={theme.colors.red}
+            selectedItemIconColor={theme.colors.green}
+            itemTextColor={theme.colors.black}
+            displayKey="categoryName"
+            searchInputStyle={styles.multiSelectStyle}
+            submitButtonColor={theme.colors.red}
+            submitButtonText="OK"
+            fontSize={18}
+          />
+          <ButtonText
+            title="Submit"
+            txtStyle={styles.btnText}
+            wrapperStyle={styles.btnWrapper}
+            onPress={editTenant}
+            isLoading={isLoading}
+          />
         </ScrollView>
-      )}
+      </View>
     </SafeAreaView>
   );
 }
