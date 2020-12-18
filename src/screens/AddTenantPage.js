@@ -193,6 +193,7 @@ function AddTenantPage({navigation}) {
   }
 
   async function addNewTenant() {
+    setIsLoading(true);
     const tenantAdminId = await registerTenantAdmin();
     const foodcourtId = await getDataAdmin();
     try {
@@ -226,6 +227,7 @@ function AddTenantPage({navigation}) {
         btnCancel: false,
       });
     }
+    setIsLoading(false);
   }
 
   React.useEffect(() => {
@@ -291,6 +293,7 @@ function AddTenantPage({navigation}) {
             txtStyle={styles.btnText}
             wrapperStyle={styles.btnWrapper}
             onPress={addNewTenant}
+            isLoading={isLoading}
           />
         </ScrollView>
       </View>

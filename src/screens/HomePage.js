@@ -9,7 +9,6 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import axios from 'axios';
-import ButtonKit from '../components/ButtonKit';
 import ButtonText from '../components/ButtonText';
 import Title from '../components/Title';
 import theme from '../theme';
