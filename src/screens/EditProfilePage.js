@@ -8,17 +8,20 @@ import {
   SafeAreaView,
   StyleSheet,
   ScrollView,
+  FlatList,
+  Dimensions,
 } from 'react-native';
-import {getData, normalize} from '../utils';
+import {normalize} from '../utils';
 import ButtonText from '../components/ButtonText';
 import ButtonKit from '../components/ButtonKit';
 import Title from '../components/Title';
 import theme from '../theme';
 import axios from 'axios';
-import SpinnerKit from '../components/SpinnerKit';
 import ImagePicker from 'react-native-image-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import CheckBox from '@react-native-community/checkbox';
+
+const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   container: {
@@ -104,6 +107,23 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     alignSelf: 'flex-start',
   },
+  horizontalWrapperTitle: {
+    width: '60%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 8,
+    alignItems: 'center',
+    alignSelf: 'flex-end',
+  },
+  btnHourTitle: {
+    textAlign: 'center',
+    alignSelf: 'center',
+    fontWeight: 'bold',
+    fontSize: normalize(14),
+  },
+  btnHourWrapperTitle: {
+    width: '50%',
+  },
   horizontalWrapper: {
     width: '100%',
     flexDirection: 'row',
@@ -114,13 +134,20 @@ const styles = StyleSheet.create({
   innerHorizontalWrapper: {
     flex: 1,
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     marginTop: 8,
     alignSelf: 'flex-start',
   },
-  dayStyle: {
+  dayStyleActive: {
     fontSize: normalize(12),
     fontWeight: 'bold',
+    color: theme.colors.red,
+    width: '30%',
+  },
+  dayStyleInactive: {
+    fontSize: normalize(12),
+    fontWeight: 'bold',
+    color: theme.colors.dark_grey,
     width: '30%',
   },
   btnText: {
@@ -132,14 +159,17 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: 'bold',
     color: theme.colors.black,
+    alignSelf: 'center',
   },
   txtBtnHourInactive: {
     textAlign: 'center',
     fontWeight: 'bold',
     color: theme.colors.dark_grey,
+    alignSelf: 'center',
   },
   btnHour: {
     width: '50%',
+    fontWeight: 'bold',
   },
   btnWrapper: {
     backgroundColor: theme.colors.red,
@@ -148,6 +178,31 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     marginVertical: 5,
     alignSelf: 'center',
+  },
+  inputSeatContainer: {
+    width: '90%',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginVertical: normalize(10),
+    paddingHorizontal: normalize(10),
+  },
+  inputSeatWrapper: {
+    width: '65%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  inputSeatStyle: {
+    width: '40%',
+    backgroundColor: theme.colors.white,
+    height: 35,
+    borderRadius: 10,
+    padding: 10,
+  },
+  plusButton: {
+    width: 20,
+    height: 20,
+
   },
 });
 
@@ -171,6 +226,9 @@ function EditProfilePage({route, navigation}) {
   const [fileData, setFileData] = React.useState(foodcourt_image);
   const [isLoading, setIsLoading] = React.useState(false);
   const [checkBoxChecked, setCheckBoxChecked] = React.useState([false, false, false, false, false, false, false]);
+  const [seats, setSeats] = React.useState({ seat1 : 0});
+  const [typeSeat, onChangeTypeSeat] = React.useState([]);
+  const [totalTypeSeat, onChangeTotalTypeSeat] = React.useState([]);
   const [time, setTime] = React.useState(new Date(defaultTime));
   const [show, setShow] = React.useState(false);
   const [section, setSection] = React.useState([]);
@@ -190,10 +248,6 @@ function EditProfilePage({route, navigation}) {
     {day: '6', ...listOpenCloseHour},
     {day: '7', ...listOpenCloseHour},
   ]);
-  // const onChange = (event, selectedDate) => {
-  //   const currentDate = selectedDate || date;
-  //   setDate(currentDate);
-  // };
 
   function chooseImage() {
     let options = {
@@ -274,10 +328,9 @@ function EditProfilePage({route, navigation}) {
   };
 
   const checkBoxChanged = (id, value) => {
-    var tempCheckBoxChecked = checkBoxChecked;
-    tempCheckBoxChecked[id] = !value;
+    let tempCheckBoxChecked = [...checkBoxChecked];
+    tempCheckBoxChecked[id] = value;
     setCheckBoxChecked(tempCheckBoxChecked);
-    console.log(tempCheckBoxChecked, '0,', checkBoxChecked[0]);
   };
 
   const formatDate = (params) => {
@@ -326,6 +379,43 @@ function EditProfilePage({route, navigation}) {
     setShow(true);
   };
 
+  const addInputSeat = (index) => {
+    console.log(index);
+    let temp = seats;
+    temp[`seat${index + 1}`] = 0;
+    console.log(temp);
+  };
+
+  const renderItem = ({item, index}) => {
+    return (
+      <View style={styles.inputSeatContainer}>
+        <View style={styles.inputSeatWrapper}>
+          <TextInput
+            style={styles.inputSeatStyle}
+            onChangeText={(text) => onChangeTypeSeat(text)}
+            value={typeSeat}
+            autoCapitalize="none"
+            keyboardType="number-pad"
+            textAlign="center"
+          />
+          <TextInput
+            style={styles.inputSeatStyle}
+            onChangeText={(text) => onChangeTotalTypeSeat(text)}
+            value={totalTypeSeat}
+            autoCapitalize="none"
+            keyboardType="number-pad"
+            textAlign="center"
+          />
+        </View>
+        <ButtonKit
+          source={require('../assets/plus-button.png')}
+          wrapperStyle={styles.plusButton}
+          onPress={() => addInputSeat(index + 1)}
+        />
+      </View>
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.innerContainer}>
@@ -365,164 +455,168 @@ function EditProfilePage({route, navigation}) {
             />
             <Text style={styles.titleInput}>Input Opening Hour List :</Text>
             <Text style={styles.subTitleInputHour}>
-              *if you not filled on certain day, it means the shop is closed on
+              *if you not tick the checkbox on certain day, it means your foodcourt is closed on
               that certain day*
             </Text>
-            <View style={styles.inputContainer}>
-              <View style={styles.horizontalWrapper}>
-                <Text style={styles.dayStyle}></Text>
-                <View style={styles.innerHorizontalWrapper}>
-                  <Text style={styles.btnHour}>Choose Open Hour</Text>
-                  <Text style={styles.btnHour}>Choose Close Hour</Text>
-                </View>
+            <View style={styles.horizontalWrapperTitle}>
+              <View style={styles.btnHourWrapperTitle}>
+                <Text style={styles.btnHourTitle}>Choose Open Hour</Text>
+              </View>
+              <View style={styles.btnHourWrapperTitle}>
+                <Text style={styles.btnHourTitle}>Choose Close Hour</Text>
               </View>
             </View>
             <View style={styles.inputContainer}>
               <View style={styles.horizontalWrapper}>
                 <CheckBox
                   value={checkBoxChecked[0]}
-                  onValueChange={() => checkBoxChanged(0, checkBoxChecked[0])}
+                  onValueChange={(value) => checkBoxChanged(0, value)}
                 />
-                <Text style={styles.dayStyle}>Monday</Text>
+                <Text style={checkBoxChecked[0] === true ? styles.dayStyleActive : styles.dayStyleInactive}>Monday</Text>
                 <View style={styles.innerHorizontalWrapper}>
                   <ButtonText
                     title={formatDate(openingHourList[0].openHour)}
-                    txtStyle={checkBoxChanged[0] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
+                    txtStyle={checkBoxChecked[0] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
                     wrapperStyle={styles.btnHour}
                     onPress={() => setSectionDay([1, 1])}
-                    disabled={checkBoxChanged[0] === true ? false : true}
+                    disabled={checkBoxChecked[0] === true ? false : true}
                   />
                   <ButtonText
                     title={formatDate(openingHourList[0].closeHour)}
-                    txtStyle={checkBoxChanged[0] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
+                    txtStyle={checkBoxChecked[0] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
                     wrapperStyle={styles.btnHour}
                     onPress={() => setSectionDay([1, 2])}
-                    disabled={checkBoxChanged[0] === true ? false : true}
+                    disabled={checkBoxChecked[0] === true ? false : true}
                   />
                 </View>
               </View>
               <View style={styles.horizontalWrapper}>
-                <CheckBox value={checkBoxChecked[1]} onValueChange={() => checkBoxChanged(1, checkBoxChecked[1])} />
-                <Text style={styles.dayStyle}>Tuesday</Text>
+                <CheckBox value={checkBoxChecked[1]} onValueChange={(value) => checkBoxChanged(1, value)} />
+                <Text style={checkBoxChecked[1] === true ? styles.dayStyleActive : styles.dayStyleInactive}>Tuesday</Text>
                 <View style={styles.innerHorizontalWrapper}>
                   <ButtonText
                     title={formatDate(openingHourList[1].openHour)}
-                    txtStyle={checkBoxChanged[1] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
+                    txtStyle={checkBoxChecked[1] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
                     wrapperStyle={styles.btnHour}
                     onPress={() => setSectionDay([2, 1])}
-                    disabled={checkBoxChanged[1] === true ? false : true}
+                    disabled={checkBoxChecked[1] === true ? false : true}
                   />
                   <ButtonText
                     title={formatDate(openingHourList[1].closeHour)}
-                    txtStyle={checkBoxChanged[1] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
+                    txtStyle={checkBoxChecked[1] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
                     wrapperStyle={styles.btnHour}
                     onPress={() => setSectionDay([2, 2])}
-                    disabled={checkBoxChanged[1] === true ? false : true}
+                    disabled={checkBoxChecked[1] === true ? false : true}
                   />
                 </View>
               </View>
               <View style={styles.horizontalWrapper}>
-                <CheckBox value={checkBoxChecked[2]} onValueChange={() => checkBoxChanged(2, checkBoxChecked[2])} />
-                <Text style={styles.dayStyle}>Wednesday</Text>
+                <CheckBox value={checkBoxChecked[2]} onValueChange={(value) => checkBoxChanged(2, value)} />
+                <Text style={checkBoxChecked[2] === true ? styles.dayStyleActive : styles.dayStyleInactive}>Wednesday</Text>
                 <View style={styles.innerHorizontalWrapper}>
                   <ButtonText
                     title={formatDate(openingHourList[2].openHour)}
-                    txtStyle={checkBoxChanged[2] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
+                    txtStyle={checkBoxChecked[2] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
                     wrapperStyle={styles.btnHour}
                     onPress={() => setSectionDay([3, 1])}
-                    disabled={checkBoxChanged[2] === true ? false : true}
+                    disabled={checkBoxChecked[2] === true ? false : true}
                   />
                   <ButtonText
                     title={formatDate(openingHourList[2].closeHour)}
-                    txtStyle={checkBoxChanged[2] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
+                    txtStyle={checkBoxChecked[2] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
                     wrapperStyle={styles.btnHour}
                     onPress={() => setSectionDay([3, 2])}
-                    disabled={checkBoxChanged[2] === true ? false : true}
+                    disabled={checkBoxChecked[2] === true ? false : true}
                   />
                 </View>
               </View>
               <View style={styles.horizontalWrapper}>
-                <CheckBox value={checkBoxChecked[3]} onValueChange={() => checkBoxChanged(3, checkBoxChecked[3])} />
-                <Text style={styles.dayStyle}>Thursday</Text>
+                <CheckBox value={checkBoxChecked[3]} onValueChange={(value) => checkBoxChanged(3, value)} />
+                <Text style={checkBoxChecked[3] === true ? styles.dayStyleActive : styles.dayStyleInactive}>Thursday</Text>
                 <View style={styles.innerHorizontalWrapper}>
                   <ButtonText
                     title={formatDate(openingHourList[3].openHour)}
-                    txtStyle={checkBoxChanged[3] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
+                    txtStyle={checkBoxChecked[3] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
                     wrapperStyle={styles.btnHour}
                     onPress={() => setSectionDay([4, 1])}
-                    disabled={checkBoxChanged[3] === true ? false : true}
+                    disabled={checkBoxChecked[3] === true ? false : true}
                   />
                   <ButtonText
                     title={formatDate(openingHourList[3].closeHour)}
-                    txtStyle={checkBoxChanged[3] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
+                    txtStyle={checkBoxChecked[3] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
                     wrapperStyle={styles.btnHour}
                     onPress={() => setSectionDay([4, 2])}
-                    disabled={checkBoxChanged[3] === true ? false : true}
+                    disabled={checkBoxChecked[3] === true ? false : true}
                   />
                 </View>
               </View>
               <View style={styles.horizontalWrapper}>
-                <CheckBox value={checkBoxChecked[4]} onValueChange={() => checkBoxChanged(4, checkBoxChecked[4])} />
-                <Text style={styles.dayStyle}>Friday</Text>
+                <CheckBox value={checkBoxChecked[4]} onValueChange={(value) => checkBoxChanged(4, value)} />
+                <Text style={checkBoxChecked[4] === true ? styles.dayStyleActive : styles.dayStyleInactive}>Friday</Text>
                 <View style={styles.innerHorizontalWrapper}>
                   <ButtonText
                     title={formatDate(openingHourList[4].openHour)}
-                    txtStyle={checkBoxChanged[4] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
+                    txtStyle={checkBoxChecked[4] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
                     wrapperStyle={styles.btnHour}
                     onPress={() => setSectionDay([5, 1])}
-                    disabled={checkBoxChanged[4] === true ? false : true}
+                    disabled={checkBoxChecked[4] === true ? false : true}
                   />
                   <ButtonText
                     title={formatDate(openingHourList[4].closeHour)}
-                    txtStyle={checkBoxChanged[4] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
+                    txtStyle={checkBoxChecked[4] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
                     wrapperStyle={styles.btnHour}
                     onPress={() => setSectionDay([5, 2])}
-                    disabled={checkBoxChanged[4] === true ? false : true}
+                    disabled={checkBoxChecked[4] === true ? false : true}
                   />
                 </View>
               </View>
               <View style={styles.horizontalWrapper}>
-                <CheckBox value={checkBoxChecked[5]} onValueChange={() => checkBoxChanged(5, checkBoxChecked[5])} />
-                <Text style={styles.dayStyle}>Saturday</Text>
+                <CheckBox value={checkBoxChecked[5]} onValueChange={(value) => checkBoxChanged(5, value)} />
+                <Text style={checkBoxChecked[5] === true ? styles.dayStyleActive : styles.dayStyleInactive}>Saturday</Text>
                 <View style={styles.innerHorizontalWrapper}>
                   <ButtonText
                     title={formatDate(openingHourList[5].openHour)}
-                    txtStyle={checkBoxChanged[5] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
+                    txtStyle={checkBoxChecked[5] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
                     wrapperStyle={styles.btnHour}
                     onPress={() => setSectionDay([6, 1])}
-                    disabled={checkBoxChanged[5] === true ? false : true}
+                    disabled={checkBoxChecked[5] === true ? false : true}
                   />
                   <ButtonText
                     title={formatDate(openingHourList[5].closeHour)}
-                    txtStyle={checkBoxChanged[5] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
+                    txtStyle={checkBoxChecked[5] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
                     wrapperStyle={styles.btnHour}
                     onPress={() => setSectionDay([6, 2])}
-                    disabled={checkBoxChanged[5] === true ? false : true}
+                    disabled={checkBoxChecked[5] === true ? false : true}
                   />
                 </View>
               </View>
               <View style={styles.horizontalWrapper}>
-                <CheckBox value={checkBoxChecked[6]} onValueChange={() => checkBoxChanged(6, checkBoxChecked[6])} />
-                <Text style={styles.dayStyle}>Sunday</Text>
+                <CheckBox value={checkBoxChecked[6]} onValueChange={(value) => checkBoxChanged(6, value)} />
+                <Text style={checkBoxChecked[6] === true ? styles.dayStyleActive : styles.dayStyleInactive}>Sunday</Text>
                 <View style={styles.innerHorizontalWrapper}>
                   <ButtonText
                     title={formatDate(openingHourList[6].openHour)}
-                    txtStyle={checkBoxChanged[6] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
+                    txtStyle={checkBoxChecked[6] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
                     wrapperStyle={styles.btnHour}
                     onPress={() => setSectionDay([7, 1])}
-                    disabled={checkBoxChanged[6] === true ? false : true}
+                    disabled={checkBoxChecked[6] === true ? false : true}
                   />
                   <ButtonText
                     title={formatDate(openingHourList[6].closeHour)}
-                    txtStyle={checkBoxChanged[6] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
+                    txtStyle={checkBoxChecked[6] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
                     wrapperStyle={styles.btnHour}
                     onPress={() => setSectionDay([7, 2])}
-                    disabled={checkBoxChanged[6] === true ? false : true}
+                    disabled={checkBoxChecked[6] === true ? false : true}
                   />
                 </View>
               </View>
             </View>
             <Text style={styles.titleInput}>Input Seats Availability :</Text>
+            <FlatList
+              data={Object.keys(seats)}
+              renderItem={({item, index}) => renderItem({item, index})}
+              keyExtractor={(index) => index.toString()}
+            />
           </View>
           <ButtonText
             title="Submit"
