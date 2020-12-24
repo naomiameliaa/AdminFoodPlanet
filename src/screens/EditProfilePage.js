@@ -9,9 +9,8 @@ import {
   StyleSheet,
   ScrollView,
   FlatList,
-  Dimensions,
 } from 'react-native';
-import {normalize} from '../utils';
+import {normalize, alertMessage} from '../utils';
 import ButtonText from '../components/ButtonText';
 import ButtonKit from '../components/ButtonKit';
 import Title from '../components/Title';
@@ -20,8 +19,6 @@ import axios from 'axios';
 import ImagePicker from 'react-native-image-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import CheckBox from '@react-native-community/checkbox';
-
-const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
 const styles = StyleSheet.create({
   container: {
@@ -179,8 +176,21 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     alignSelf: 'center',
   },
+  titleSeatWrapper: {
+    width: '80%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginHorizontal: normalize(15),
+
+  },
+  titleSeatStyle: {
+    width: '40%',
+    fontWeight: 'bold',
+    fontSize: normalize(14),
+  },
   inputSeatContainer: {
     width: '90%',
+    alignSelf: 'center',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -188,7 +198,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: normalize(10),
   },
   inputSeatWrapper: {
-    width: '65%',
+    width: '80%',
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
@@ -226,10 +236,23 @@ function EditProfilePage({route, navigation}) {
   const [fileData, setFileData] = React.useState(foodcourt_image);
   const [isLoading, setIsLoading] = React.useState(false);
   const [checkBoxChecked, setCheckBoxChecked] = React.useState([false, false, false, false, false, false, false]);
-  const [seats, setSeats] = React.useState({ seat1 : 0});
-  const [typeSeat, onChangeTypeSeat] = React.useState([]);
-  const [totalTypeSeat, onChangeTotalTypeSeat] = React.useState([]);
-  const [time, setTime] = React.useState(new Date(defaultTime));
+  const [seats, setSeats] = React.useState(
+    [
+      {
+        seat1 : {type: 0, qty: 0, isShow: 1},
+        seat2 : {type: 0, qty: 0, isShow: 0},
+        seat3 : {type: 0, qty: 0, isShow: 0},
+        seat4 : {type: 0, qty: 0, isShow: 0},
+        seat5 : {type: 0, qty: 0, isShow: 0},
+        seat6 : {type: 0, qty: 0, isShow: 0},
+        seat7 : {type: 0, qty: 0, isShow: 0},
+        seat8 : {type: 0, qty: 0, isShow: 0},
+        seat9 : {type: 0, qty: 0, isShow: 0},
+        seat10 : {type: 0, qty: 0, isShow: 0},
+      },
+    ]
+  );
+  const [time] = React.useState(new Date(defaultTime));
   const [show, setShow] = React.useState(false);
   const [section, setSection] = React.useState([]);
   const listOpenCloseHour = {
@@ -339,39 +362,55 @@ function EditProfilePage({route, navigation}) {
   };
 
   async function updateFoodcourt() {
+    setIsLoading(true);
+    const objSeat = seats[0];
+    let objBody = {};
+    for (const [key, value] of Object.entries(objSeat)) {
+      if (value.isShow === 1){
+        objBody[value.type] = value.qty;
+      }
+    }
     let bodyOpeningHour = [];
     openingHourList.forEach((item, index) => {
-      const tempObj = {
-        ...item,
-        openHour: formatDate(item.openHour),
-        closeHour: formatDate(item.closeHour),
-      };
-      bodyOpeningHour.push(tempObj);
+      if (item.day <= 7) {
+        if (checkBoxChecked[index]) {
+          const tempObj = {
+            ...item,
+            openHour: formatDate(item.openHour),
+            closeHour: formatDate(item.closeHour),
+          };
+          console.log(tempObj);
+          bodyOpeningHour.push(tempObj);
+        }
+      }
     });
-    console.log('bodyOpeningHour', bodyOpeningHour);
     try {
       const response = await axios.put(
-        'https://food-planet.herokuapp.com/foodcourts',
+        'https://food-planet.herokuapp.com/foodcourts/update',
         {
           foodcourtId: 1,
           name: foodcourtName,
           address: foodcourtAddress,
           description: foodcourtDesc,
           openingHourList: bodyOpeningHour,
-          seats: {
-            2: 20,
-            4: 15,
-            6: 10,
-          },
+          seats: objBody,
           image: foodcourt_image,
         },
       );
+      console.log(response.data);
       if (response.data.msg === 'Update foodcourt success') {
-        console.log('Update info success');
+        alertMessage({
+          titleMessage: 'Success',
+          bodyMessage: 'Update Profile successfully',
+          btnText: 'OK',
+          onPressOK: () => navigation.goBack(),
+          btnCancel: false,
+        });
       }
     } catch (error) {
       console.log('error:', error);
     }
+    setIsLoading(false);
   }
 
   const setSectionDay = (sectionDay) => {
@@ -379,41 +418,98 @@ function EditProfilePage({route, navigation}) {
     setShow(true);
   };
 
-  const addInputSeat = (index) => {
+  const addInputSeat = (index, item) => {
+    if (index && index <= 10){
+      let arr = [];
+      const obj = seats[0];
+      let tempObj = obj;
+      tempObj[`seat${index}`] = {
+        ...tempObj[`seat${index}`],
+        isShow: 1,
+      };
+      arr.push(tempObj);
+      setSeats(arr);
+    }
+  };
+
+  const decreaseInputSeat = (index, item) => {
     console.log(index);
-    let temp = seats;
-    temp[`seat${index + 1}`] = 0;
-    console.log(temp);
+    let arr = [];
+    const obj = seats[0];
+    let tempObj = obj;
+    tempObj[`seat${index}`] = {
+      ...tempObj[`seat${index}`],
+      isShow: 0,
+    };
+    arr.push(tempObj);
+    setSeats(arr);
+  };
+
+  const onChangeTypeSeat = (index, text) => {
+    let arr = [];
+    const obj = seats[0];
+    let tempObj = obj;
+    tempObj[`seat${index}`] = {
+      ...tempObj[`seat${index}`],
+      type: text,
+    };
+    arr.push(tempObj);
+    setSeats(arr);
+  };
+
+  const onChangeTotalTypeSeat = (index, text) => {
+    let arr = [];
+    const obj = seats[0];
+    let tempObj = obj;
+    tempObj[`seat${index}`] = {
+      ...tempObj[`seat${index}`],
+      qty: text,
+    };
+    arr.push(tempObj);
+    setSeats(arr);
   };
 
   const renderItem = ({item, index}) => {
-    return (
-      <View style={styles.inputSeatContainer}>
-        <View style={styles.inputSeatWrapper}>
-          <TextInput
-            style={styles.inputSeatStyle}
-            onChangeText={(text) => onChangeTypeSeat(text)}
-            value={typeSeat}
-            autoCapitalize="none"
-            keyboardType="number-pad"
-            textAlign="center"
-          />
-          <TextInput
-            style={styles.inputSeatStyle}
-            onChangeText={(text) => onChangeTotalTypeSeat(text)}
-            value={totalTypeSeat}
-            autoCapitalize="none"
-            keyboardType="number-pad"
-            textAlign="center"
+    const tempObj = seats[0];
+    let temp = null;
+    for (const [key, value] of Object.entries(tempObj)) {
+      if (value.isShow !== 1 ){
+        const val = key.split('seat');
+        // eslint-disable-next-line radix
+        temp = parseInt(val[1]);
+        break;
+      }
+    }
+
+    if (tempObj[item].isShow === 0){
+      return null;
+    } else {
+      return (
+        <View style={styles.inputSeatContainer}>
+          <View style={styles.inputSeatWrapper}>
+            <TextInput
+              style={styles.inputSeatStyle}
+              onChangeText={(text) => onChangeTypeSeat(index + 1, text)}
+              autoCapitalize="none"
+              keyboardType="number-pad"
+              textAlign="center"
+            />
+            <TextInput
+              style={styles.inputSeatStyle}
+              onChangeText={(text) => onChangeTotalTypeSeat(index + 1, text)}
+              autoCapitalize="none"
+              keyboardType="number-pad"
+              textAlign="center"
+            />
+          </View>
+          <ButtonKit
+            source={index > 0 ? require('../assets/minus-button.png') : require('../assets/plus-button.png')}
+            wrapperStyle={styles.plusButton}
+            onPress={() => index === 0 ? addInputSeat(temp, item) : decreaseInputSeat(index + 1, item)}
           />
         </View>
-        <ButtonKit
-          source={require('../assets/plus-button.png')}
-          wrapperStyle={styles.plusButton}
-          onPress={() => addInputSeat(index + 1)}
-        />
-      </View>
-    );
+      );
+    }
   };
 
   return (
@@ -612,10 +708,17 @@ function EditProfilePage({route, navigation}) {
               </View>
             </View>
             <Text style={styles.titleInput}>Input Seats Availability :</Text>
+            <View style={styles.inputSeatContainer}>
+              <View style={styles.titleSeatWrapper}>
+                <Text style={styles.titleSeatStyle}>Seat Type</Text>
+                <Text style={styles.titleSeatStyle}>Total Seat</Text>
+              </View>
+            </View>
             <FlatList
-              data={Object.keys(seats)}
+              data={Object.keys(seats[0])}
               renderItem={({item, index}) => renderItem({item, index})}
               keyExtractor={(index) => index.toString()}
+              extraData={seats}
             />
           </View>
           <ButtonText
