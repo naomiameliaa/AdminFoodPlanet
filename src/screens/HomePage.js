@@ -9,6 +9,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import axios from 'axios';
+import ButtonKit from '../components/ButtonKit';
 import ButtonText from '../components/ButtonText';
 import Title from '../components/Title';
 import theme from '../theme';
@@ -41,15 +42,29 @@ const styles = StyleSheet.create({
   foodcourtImg: {
     borderRadius: 10,
     width: '100%',
-    height: 200,
+    height: 220,
+  },
+  horizontalWrapper: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginVertical: normalize(10),
+    paddingHorizontal: normalize(10),
+  },
+  detailFoodcourt: {
+    width: '90%',
+  },
+  infoStyle: {
+    width: 20,
+    height: 20,
   },
   titleFoodCourt: {
     fontSize: normalize(16),
     fontWeight: 'bold',
-    marginTop: normalize(10),
     marginBottom: normalize(5),
   },
   txtStyle: {
+    textAlign: 'justify',
     marginBottom: 3,
   },
   buttonText: {
@@ -191,12 +206,27 @@ function HomePage({navigation}) {
             style={styles.foodcourtImg}
             source={{uri: `data:image/jpeg;base64,${foodcourtData.image}`}}
           />
-          <View style={styles.detailContainer}>
-            <Text style={styles.titleFoodCourt} numberOfLines={1}>
-              {foodcourtData.name}
-            </Text>
-            <Text style={styles.txtStyle}>{foodcourtData.address}</Text>
-            <Text style={styles.txtStyle}>{foodcourtData.description}</Text>
+          <View style={styles.horizontalWrapper}>
+            <View style={styles.detailFoodcourt}>
+              <Text style={styles.titleFoodCourt} numberOfLines={1}>
+                {foodcourtData.name}
+              </Text>
+              <Text style={styles.txtStyle}>{foodcourtData.address}</Text>
+              <Text style={styles.txtStyle}>{foodcourtData.description}</Text>
+            </View>
+            <ButtonKit
+              source={require('../assets/info.png')}
+              wrapperStyle={styles.infoStyle}
+              onPress={() =>
+                navigation.navigate('DetailFoodcourt', {
+                  foodcourtImage: foodcourtData.image,
+                  foodcourtName: foodcourtData.name,
+                  foodcourtDesc: foodcourtData.description,
+                  foodcourtLoc: foodcourtData.address,
+                  foodcourtHourList: foodcourtData.openingHourList,
+                })
+              }
+            />
           </View>
           <View style={styles.btnContainer}>
             <TouchableOpacity

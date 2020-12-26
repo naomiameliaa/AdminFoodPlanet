@@ -157,18 +157,12 @@ function AddTenantPage({navigation}) {
   };
 
   async function getListCategory() {
-    const foodcourtId = await getDataAdmin();
     try {
       const response = await axios.get(
-        'https://food-planet.herokuapp.com/foodcourts/allCategory',
-        {
-          params: {
-            foodcourtId: foodcourtId,
-          },
-        },
+        'https://food-planet.herokuapp.com/tenants/allCategories',
       );
       if (response.data.msg === 'Query success') {
-        console.log(response.data.object);
+        console.log('ini response', response.data.object);
         setListCategory(response.data.object);
       }
     } catch (error) {

@@ -365,8 +365,8 @@ function EditProfilePage({route, navigation}) {
     setIsLoading(true);
     const objSeat = seats[0];
     let objBody = {};
-    for (const [key, value] of Object.entries(objSeat)) {
-      if (value.isShow === 1){
+    for (const [value] of Object.entries(objSeat)) {
+      if (value.isShow === 1) {
         objBody[value.type] = value.qty;
       }
     }

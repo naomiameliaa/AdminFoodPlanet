@@ -6,6 +6,7 @@ import {AuthContext} from './context';
 import {getData} from './src/utils';
 import LandingPage from './src/screens/LandingPage';
 import HomePage from './src/screens/HomePage';
+import DetailFoodcourt from './src/screens/DetailFoodcourt';
 import ManageTenantPage from './src/screens/ManageTenantPage';
 import TenantDetailPage from './src/screens/TenantDetailPage';
 import EditProfilePage from './src/screens/EditProfilePage';
@@ -37,6 +38,11 @@ function HomeStackScreen() {
       <HomeStack.Screen
         name="HomePage"
         component={HomePage}
+        options={{headerShown: false}}
+      />
+      <HomeStack.Screen
+        name="DetailFoodcourt"
+        component={DetailFoodcourt}
         options={{headerShown: false}}
       />
       <HomeStack.Screen

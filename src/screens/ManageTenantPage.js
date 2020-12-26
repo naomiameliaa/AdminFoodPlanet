@@ -78,6 +78,7 @@ const styles = StyleSheet.create({
     marginRight: 20,
   },
   titleTenant: {
+    width: '65%',
     marginVertical: 8,
     fontWeight: 'bold',
     fontSize: normalize(18),
