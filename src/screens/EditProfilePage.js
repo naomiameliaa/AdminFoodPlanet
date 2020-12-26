@@ -1,24 +1,24 @@
+/* eslint-disable prettier/prettier */
 import * as React from 'react';
 import {
   View,
   Text,
   Image,
-  FlatList,
   TextInput,
   SafeAreaView,
   StyleSheet,
-  Platform,
   ScrollView,
+  FlatList,
 } from 'react-native';
-import {getData, normalize} from '../utils';
+import {normalize, alertMessage} from '../utils';
 import ButtonText from '../components/ButtonText';
 import ButtonKit from '../components/ButtonKit';
 import Title from '../components/Title';
 import theme from '../theme';
 import axios from 'axios';
-import SpinnerKit from '../components/SpinnerKit';
 import ImagePicker from 'react-native-image-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
+import CheckBox from '@react-native-community/checkbox';
 
 const styles = StyleSheet.create({
   container: {
@@ -104,6 +104,23 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     alignSelf: 'flex-start',
   },
+  horizontalWrapperTitle: {
+    width: '60%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 8,
+    alignItems: 'center',
+    alignSelf: 'flex-end',
+  },
+  btnHourTitle: {
+    textAlign: 'center',
+    alignSelf: 'center',
+    fontWeight: 'bold',
+    fontSize: normalize(14),
+  },
+  btnHourWrapperTitle: {
+    width: '50%',
+  },
   horizontalWrapper: {
     width: '100%',
     flexDirection: 'row',
@@ -114,13 +131,20 @@ const styles = StyleSheet.create({
   innerHorizontalWrapper: {
     flex: 1,
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     marginTop: 8,
     alignSelf: 'flex-start',
   },
-  dayStyle: {
+  dayStyleActive: {
     fontSize: normalize(12),
     fontWeight: 'bold',
+    color: theme.colors.red,
+    width: '30%',
+  },
+  dayStyleInactive: {
+    fontSize: normalize(12),
+    fontWeight: 'bold',
+    color: theme.colors.dark_grey,
     width: '30%',
   },
   btnText: {
@@ -128,13 +152,21 @@ const styles = StyleSheet.create({
     fontSize: normalize(18),
     fontWeight: 'bold',
   },
-  txtBtnHour: {
+  txtBtnHourActive: {
+    textAlign: 'center',
+    fontWeight: 'bold',
+    color: theme.colors.black,
+    alignSelf: 'center',
+  },
+  txtBtnHourInactive: {
     textAlign: 'center',
     fontWeight: 'bold',
     color: theme.colors.dark_grey,
+    alignSelf: 'center',
   },
   btnHour: {
     width: '50%',
+    fontWeight: 'bold',
   },
   btnWrapper: {
     backgroundColor: theme.colors.red,
@@ -143,6 +175,44 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     marginVertical: 5,
     alignSelf: 'center',
+  },
+  titleSeatWrapper: {
+    width: '80%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginHorizontal: normalize(15),
+
+  },
+  titleSeatStyle: {
+    width: '40%',
+    fontWeight: 'bold',
+    fontSize: normalize(14),
+  },
+  inputSeatContainer: {
+    width: '90%',
+    alignSelf: 'center',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginVertical: normalize(10),
+    paddingHorizontal: normalize(10),
+  },
+  inputSeatWrapper: {
+    width: '80%',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  inputSeatStyle: {
+    width: '40%',
+    backgroundColor: theme.colors.white,
+    height: 35,
+    borderRadius: 10,
+    padding: 10,
+  },
+  plusButton: {
+    width: 20,
+    height: 20,
+
   },
 });
 
@@ -165,8 +235,24 @@ function EditProfilePage({route, navigation}) {
   );
   const [fileData, setFileData] = React.useState(foodcourt_image);
   const [isLoading, setIsLoading] = React.useState(false);
-  const [date, setDate] = React.useState(new Date());
-  const [time, setTime] = React.useState(new Date());
+  const [checkBoxChecked, setCheckBoxChecked] = React.useState([false, false, false, false, false, false, false]);
+  const [seats, setSeats] = React.useState(
+    [
+      {
+        seat1 : {type: 0, qty: 0, isShow: 1},
+        seat2 : {type: 0, qty: 0, isShow: 0},
+        seat3 : {type: 0, qty: 0, isShow: 0},
+        seat4 : {type: 0, qty: 0, isShow: 0},
+        seat5 : {type: 0, qty: 0, isShow: 0},
+        seat6 : {type: 0, qty: 0, isShow: 0},
+        seat7 : {type: 0, qty: 0, isShow: 0},
+        seat8 : {type: 0, qty: 0, isShow: 0},
+        seat9 : {type: 0, qty: 0, isShow: 0},
+        seat10 : {type: 0, qty: 0, isShow: 0},
+      },
+    ]
+  );
+  const [time] = React.useState(new Date(defaultTime));
   const [show, setShow] = React.useState(false);
   const [section, setSection] = React.useState([]);
   const listOpenCloseHour = {
@@ -185,10 +271,6 @@ function EditProfilePage({route, navigation}) {
     {day: '6', ...listOpenCloseHour},
     {day: '7', ...listOpenCloseHour},
   ]);
-  // const onChange = (event, selectedDate) => {
-  //   const currentDate = selectedDate || date;
-  //   setDate(currentDate);
-  // };
 
   function chooseImage() {
     let options = {
@@ -234,9 +316,8 @@ function EditProfilePage({route, navigation}) {
 
   const onChange = (event, selectedValue) => {
     setShow(false);
-    const currentDate = selectedValue || new Date();
+    const currentDate = selectedValue || new Date(defaultTime);
     let obj = [];
-    // setTime(currentDate);
     if (section[0] === 1 && section[1] === 1) {
       obj = [...openingHourList, (openingHourList[0].openHour = currentDate)];
     } else if (section[0] === 1 && section[1] === 2) {
@@ -269,50 +350,166 @@ function EditProfilePage({route, navigation}) {
     setOpeningHourList(obj);
   };
 
+  const checkBoxChanged = (id, value) => {
+    let tempCheckBoxChecked = [...checkBoxChecked];
+    tempCheckBoxChecked[id] = value;
+    setCheckBoxChecked(tempCheckBoxChecked);
+  };
+
   const formatDate = (params) => {
     const times = new Date(params);
-    // eslint-disable-next-line prettier/prettier
     return `${String(times.getHours()).padStart(2, '0')}:${String(times.getMinutes()).padStart(2, '0')}`;
   };
 
   async function updateFoodcourt() {
+    setIsLoading(true);
+    const objSeat = seats[0];
+    let objBody = {};
+    for (const [key, value] of Object.entries(objSeat)) {
+      if (value.isShow === 1){
+        objBody[value.type] = value.qty;
+      }
+    }
     let bodyOpeningHour = [];
     openingHourList.forEach((item, index) => {
-      const tempObj = {
-        ...item,
-        openHour: formatDate(item.openHour),
-        closeHour: formatDate(item.closeHour),
-      };
-      bodyOpeningHour.push(tempObj);
+      if (item.day <= 7) {
+        if (checkBoxChecked[index]) {
+          const tempObj = {
+            ...item,
+            openHour: formatDate(item.openHour),
+            closeHour: formatDate(item.closeHour),
+          };
+          console.log(tempObj);
+          bodyOpeningHour.push(tempObj);
+        }
+      }
     });
     try {
       const response = await axios.put(
-        'https://food-planet.herokuapp.com/foodcourts',
+        'https://food-planet.herokuapp.com/foodcourts/update',
         {
           foodcourtId: 1,
           name: foodcourtName,
           address: foodcourtAddress,
           description: foodcourtDesc,
           openingHourList: bodyOpeningHour,
-          seats: {
-            2: 20,
-            4: 15,
-            6: 10,
-          },
+          seats: objBody,
           image: foodcourt_image,
         },
       );
+      console.log(response.data);
       if (response.data.msg === 'Update foodcourt success') {
-        console.log('Update info success');
+        alertMessage({
+          titleMessage: 'Success',
+          bodyMessage: 'Update Profile successfully',
+          btnText: 'OK',
+          onPressOK: () => navigation.goBack(),
+          btnCancel: false,
+        });
       }
     } catch (error) {
       console.log('error:', error);
     }
+    setIsLoading(false);
   }
 
   const setSectionDay = (sectionDay) => {
     setSection(sectionDay);
     setShow(true);
+  };
+
+  const addInputSeat = (index, item) => {
+    if (index && index <= 10){
+      let arr = [];
+      const obj = seats[0];
+      let tempObj = obj;
+      tempObj[`seat${index}`] = {
+        ...tempObj[`seat${index}`],
+        isShow: 1,
+      };
+      arr.push(tempObj);
+      setSeats(arr);
+    }
+  };
+
+  const decreaseInputSeat = (index, item) => {
+    console.log(index);
+    let arr = [];
+    const obj = seats[0];
+    let tempObj = obj;
+    tempObj[`seat${index}`] = {
+      ...tempObj[`seat${index}`],
+      isShow: 0,
+    };
+    arr.push(tempObj);
+    setSeats(arr);
+  };
+
+  const onChangeTypeSeat = (index, text) => {
+    let arr = [];
+    const obj = seats[0];
+    let tempObj = obj;
+    tempObj[`seat${index}`] = {
+      ...tempObj[`seat${index}`],
+      type: text,
+    };
+    arr.push(tempObj);
+    setSeats(arr);
+  };
+
+  const onChangeTotalTypeSeat = (index, text) => {
+    let arr = [];
+    const obj = seats[0];
+    let tempObj = obj;
+    tempObj[`seat${index}`] = {
+      ...tempObj[`seat${index}`],
+      qty: text,
+    };
+    arr.push(tempObj);
+    setSeats(arr);
+  };
+
+  const renderItem = ({item, index}) => {
+    const tempObj = seats[0];
+    let temp = null;
+    for (const [key, value] of Object.entries(tempObj)) {
+      if (value.isShow !== 1 ){
+        const val = key.split('seat');
+        // eslint-disable-next-line radix
+        temp = parseInt(val[1]);
+        break;
+      }
+    }
+
+    if (tempObj[item].isShow === 0){
+      return null;
+    } else {
+      return (
+        <View style={styles.inputSeatContainer}>
+          <View style={styles.inputSeatWrapper}>
+            <TextInput
+              style={styles.inputSeatStyle}
+              onChangeText={(text) => onChangeTypeSeat(index + 1, text)}
+              autoCapitalize="none"
+              keyboardType="number-pad"
+              textAlign="center"
+            />
+            <TextInput
+              style={styles.inputSeatStyle}
+              onChangeText={(text) => onChangeTotalTypeSeat(index + 1, text)}
+              autoCapitalize="none"
+              keyboardType="number-pad"
+              textAlign="center"
+            />
+          </View>
+          <ButtonKit
+            source={index > 0 ? require('../assets/minus-button.png') : require('../assets/plus-button.png')}
+            wrapperStyle={styles.plusButton}
+            onPress={() => index === 0 ? addInputSeat(temp, item) : decreaseInputSeat(index + 1, item)}
+          />
+        </View>
+      );
+    }
   };
 
   return (
@@ -354,131 +551,175 @@ function EditProfilePage({route, navigation}) {
             />
             <Text style={styles.titleInput}>Input Opening Hour List :</Text>
             <Text style={styles.subTitleInputHour}>
-              *if you not filled on certain day, it means the shop is closed on
+              *if you not tick the checkbox on certain day, it means your foodcourt is closed on
               that certain day*
             </Text>
+            <View style={styles.horizontalWrapperTitle}>
+              <View style={styles.btnHourWrapperTitle}>
+                <Text style={styles.btnHourTitle}>Choose Open Hour</Text>
+              </View>
+              <View style={styles.btnHourWrapperTitle}>
+                <Text style={styles.btnHourTitle}>Choose Close Hour</Text>
+              </View>
+            </View>
             <View style={styles.inputContainer}>
               <View style={styles.horizontalWrapper}>
-                <Text style={styles.dayStyle}>Monday</Text>
+                <CheckBox
+                  value={checkBoxChecked[0]}
+                  onValueChange={(value) => checkBoxChanged(0, value)}
+                />
+                <Text style={checkBoxChecked[0] === true ? styles.dayStyleActive : styles.dayStyleInactive}>Monday</Text>
                 <View style={styles.innerHorizontalWrapper}>
                   <ButtonText
                     title={formatDate(openingHourList[0].openHour)}
-                    txtStyle={styles.txtBtnHour}
+                    txtStyle={checkBoxChecked[0] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
                     wrapperStyle={styles.btnHour}
                     onPress={() => setSectionDay([1, 1])}
+                    disabled={checkBoxChecked[0] === true ? false : true}
                   />
                   <ButtonText
                     title={formatDate(openingHourList[0].closeHour)}
-                    txtStyle={styles.txtBtnHour}
+                    txtStyle={checkBoxChecked[0] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
                     wrapperStyle={styles.btnHour}
                     onPress={() => setSectionDay([1, 2])}
+                    disabled={checkBoxChecked[0] === true ? false : true}
                   />
                 </View>
               </View>
               <View style={styles.horizontalWrapper}>
-                <Text style={styles.dayStyle}>Tuesday</Text>
+                <CheckBox value={checkBoxChecked[1]} onValueChange={(value) => checkBoxChanged(1, value)} />
+                <Text style={checkBoxChecked[1] === true ? styles.dayStyleActive : styles.dayStyleInactive}>Tuesday</Text>
                 <View style={styles.innerHorizontalWrapper}>
                   <ButtonText
                     title={formatDate(openingHourList[1].openHour)}
-                    txtStyle={styles.txtBtnHour}
+                    txtStyle={checkBoxChecked[1] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
                     wrapperStyle={styles.btnHour}
                     onPress={() => setSectionDay([2, 1])}
+                    disabled={checkBoxChecked[1] === true ? false : true}
                   />
                   <ButtonText
                     title={formatDate(openingHourList[1].closeHour)}
-                    txtStyle={styles.txtBtnHour}
+                    txtStyle={checkBoxChecked[1] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
                     wrapperStyle={styles.btnHour}
                     onPress={() => setSectionDay([2, 2])}
+                    disabled={checkBoxChecked[1] === true ? false : true}
                   />
                 </View>
               </View>
               <View style={styles.horizontalWrapper}>
-                <Text style={styles.dayStyle}>Wednesday</Text>
+                <CheckBox value={checkBoxChecked[2]} onValueChange={(value) => checkBoxChanged(2, value)} />
+                <Text style={checkBoxChecked[2] === true ? styles.dayStyleActive : styles.dayStyleInactive}>Wednesday</Text>
                 <View style={styles.innerHorizontalWrapper}>
                   <ButtonText
                     title={formatDate(openingHourList[2].openHour)}
-                    txtStyle={styles.txtBtnHour}
+                    txtStyle={checkBoxChecked[2] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
                     wrapperStyle={styles.btnHour}
                     onPress={() => setSectionDay([3, 1])}
+                    disabled={checkBoxChecked[2] === true ? false : true}
                   />
                   <ButtonText
                     title={formatDate(openingHourList[2].closeHour)}
-                    txtStyle={styles.txtBtnHour}
+                    txtStyle={checkBoxChecked[2] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
                     wrapperStyle={styles.btnHour}
                     onPress={() => setSectionDay([3, 2])}
+                    disabled={checkBoxChecked[2] === true ? false : true}
                   />
                 </View>
               </View>
               <View style={styles.horizontalWrapper}>
-                <Text style={styles.dayStyle}>Thursday</Text>
+                <CheckBox value={checkBoxChecked[3]} onValueChange={(value) => checkBoxChanged(3, value)} />
+                <Text style={checkBoxChecked[3] === true ? styles.dayStyleActive : styles.dayStyleInactive}>Thursday</Text>
                 <View style={styles.innerHorizontalWrapper}>
                   <ButtonText
                     title={formatDate(openingHourList[3].openHour)}
-                    txtStyle={styles.txtBtnHour}
+                    txtStyle={checkBoxChecked[3] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
                     wrapperStyle={styles.btnHour}
                     onPress={() => setSectionDay([4, 1])}
+                    disabled={checkBoxChecked[3] === true ? false : true}
                   />
                   <ButtonText
                     title={formatDate(openingHourList[3].closeHour)}
-                    txtStyle={styles.txtBtnHour}
+                    txtStyle={checkBoxChecked[3] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
                     wrapperStyle={styles.btnHour}
                     onPress={() => setSectionDay([4, 2])}
+                    disabled={checkBoxChecked[3] === true ? false : true}
                   />
                 </View>
               </View>
               <View style={styles.horizontalWrapper}>
-                <Text style={styles.dayStyle}>Friday</Text>
+                <CheckBox value={checkBoxChecked[4]} onValueChange={(value) => checkBoxChanged(4, value)} />
+                <Text style={checkBoxChecked[4] === true ? styles.dayStyleActive : styles.dayStyleInactive}>Friday</Text>
                 <View style={styles.innerHorizontalWrapper}>
                   <ButtonText
                     title={formatDate(openingHourList[4].openHour)}
-                    txtStyle={styles.txtBtnHour}
+                    txtStyle={checkBoxChecked[4] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
                     wrapperStyle={styles.btnHour}
                     onPress={() => setSectionDay([5, 1])}
+                    disabled={checkBoxChecked[4] === true ? false : true}
                   />
                   <ButtonText
                     title={formatDate(openingHourList[4].closeHour)}
-                    txtStyle={styles.txtBtnHour}
+                    txtStyle={checkBoxChecked[4] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
                     wrapperStyle={styles.btnHour}
                     onPress={() => setSectionDay([5, 2])}
+                    disabled={checkBoxChecked[4] === true ? false : true}
                   />
                 </View>
               </View>
               <View style={styles.horizontalWrapper}>
-                <Text style={styles.dayStyle}>Saturday</Text>
+                <CheckBox value={checkBoxChecked[5]} onValueChange={(value) => checkBoxChanged(5, value)} />
+                <Text style={checkBoxChecked[5] === true ? styles.dayStyleActive : styles.dayStyleInactive}>Saturday</Text>
                 <View style={styles.innerHorizontalWrapper}>
                   <ButtonText
                     title={formatDate(openingHourList[5].openHour)}
-                    txtStyle={styles.txtBtnHour}
+                    txtStyle={checkBoxChecked[5] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
                     wrapperStyle={styles.btnHour}
                     onPress={() => setSectionDay([6, 1])}
+                    disabled={checkBoxChecked[5] === true ? false : true}
                   />
                   <ButtonText
                     title={formatDate(openingHourList[5].closeHour)}
-                    txtStyle={styles.txtBtnHour}
+                    txtStyle={checkBoxChecked[5] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
                     wrapperStyle={styles.btnHour}
                     onPress={() => setSectionDay([6, 2])}
+                    disabled={checkBoxChecked[5] === true ? false : true}
                   />
                 </View>
               </View>
               <View style={styles.horizontalWrapper}>
-                <Text style={styles.dayStyle}>Sunday</Text>
+                <CheckBox value={checkBoxChecked[6]} onValueChange={(value) => checkBoxChanged(6, value)} />
+                <Text style={checkBoxChecked[6] === true ? styles.dayStyleActive : styles.dayStyleInactive}>Sunday</Text>
                 <View style={styles.innerHorizontalWrapper}>
                   <ButtonText
                     title={formatDate(openingHourList[6].openHour)}
-                    txtStyle={styles.txtBtnHour}
+                    txtStyle={checkBoxChecked[6] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
                     wrapperStyle={styles.btnHour}
                     onPress={() => setSectionDay([7, 1])}
+                    disabled={checkBoxChecked[6] === true ? false : true}
                   />
                   <ButtonText
                     title={formatDate(openingHourList[6].closeHour)}
-                    txtStyle={styles.txtBtnHour}
+                    txtStyle={checkBoxChecked[6] === true ? styles.txtBtnHourActive : styles.txtBtnHourInactive}
                     wrapperStyle={styles.btnHour}
                     onPress={() => setSectionDay([7, 2])}
+                    disabled={checkBoxChecked[6] === true ? false : true}
                   />
                 </View>
               </View>
             </View>
             <Text style={styles.titleInput}>Input Seats Availability :</Text>
+            <View style={styles.inputSeatContainer}>
+              <View style={styles.titleSeatWrapper}>
+                <Text style={styles.titleSeatStyle}>Seat Type</Text>
+                <Text style={styles.titleSeatStyle}>Total Seat</Text>
+              </View>
+            </View>
+            <FlatList
+              data={Object.keys(seats[0])}
+              renderItem={({item, index}) => renderItem({item, index})}
+              keyExtractor={(index) => index.toString()}
+              extraData={seats}
+            />
           </View>
           <ButtonText
             title="Submit"
