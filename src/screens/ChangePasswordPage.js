@@ -82,7 +82,7 @@ function ChangePassword({navigation}) {
   const [confirmPassword, onChangeConfirmPassword] = React.useState('');
 
   const getDataTenantAdmin = async () => {
-    const dataTenantAdmin = await getData('tenantAdminData');
+    const dataTenantAdmin = await getData('adminData');
     if (getDataTenantAdmin !== null) {
       return dataTenantAdmin.userId;
     } else {
