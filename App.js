@@ -100,7 +100,7 @@ const RootStackScreen = ({adminData}) => (
 function App() {
   const getDataAdmin = async (key) => {
     const dataAdmin = await getData(key);
-    if (dataAdmin !== null) {
+    if (dataAdmin) {
       setAdminData(dataAdmin);
     } else {
       setAdminData(null);

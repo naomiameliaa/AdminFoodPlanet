@@ -157,7 +157,7 @@ function EditTenantPage({route, navigation}) {
 
   const getDataAdmin = async () => {
     const dataAdmin = await getData('adminData');
-    if (getDataAdmin !== null) {
+    if (dataAdmin) {
       return dataAdmin.foodcourtId;
     } else {
       return null;
