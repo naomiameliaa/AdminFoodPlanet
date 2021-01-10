@@ -153,6 +153,12 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+          storeFile file('foodPlanet.keystore')
+          storePassword 'password'
+          keyAlias 'foodPlanet'
+          keyPassword 'password'
+        }
     }
     buildTypes {
         debug {
@@ -161,7 +167,7 @@ android {
         release {
             // Caution! In production, you need to generate your own keystore file.
             // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
@@ -178,7 +184,10 @@ android {
                 output.versionCodeOverride =
                         versionCodes.get(abi) * 1048576 + defaultConfig.versionCode
             }
-
+            def date = new Date()
+            def formattedDate = date.format('yyyyMMddHHmmss')
+            def apkName = "Admin_FoodPlanet_" + variant.name + '_' + formattedDate + '.apk'
+            output.outputFileName = apkName
         }
     }
 }
