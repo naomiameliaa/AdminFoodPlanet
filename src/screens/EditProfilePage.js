@@ -40,33 +40,71 @@ const styles = StyleSheet.create({
   },
   inputStyle: {
     width: '100%',
-    height: 40,
+    height: normalize(42),
     borderRadius: 10,
     backgroundColor: theme.colors.white,
-    fontSize: 18,
+    fontSize: 16,
     paddingHorizontal: 20,
-    marginVertical: 8,
+    paddingVertical: 'auto',
+    marginVertical: 10,
     justifyContent: 'center',
+  },
+  inputStyleError: {
+    width: '100%',
+    height: normalize(42),
+    borderRadius: 10,
+    backgroundColor: theme.colors.white,
+    fontSize: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 'auto',
+    marginVertical: 10,
+    justifyContent: 'center',
+    borderColor: theme.colors.red,
+    borderWidth: 1,
   },
   textArea: {
     width: '100%',
-    height: 120,
+    height: normalize(120),
     borderRadius: 10,
     backgroundColor: theme.colors.white,
-    fontSize: 18,
+    fontSize: 16,
     paddingHorizontal: 20,
     marginVertical: 8,
     textAlignVertical: 'top',
   },
-  textAreaSmall: {
+  textAreaError: {
     width: '100%',
-    height: 80,
+    height: normalize(120),
     borderRadius: 10,
     backgroundColor: theme.colors.white,
-    fontSize: 18,
+    fontSize: 16,
     paddingHorizontal: 20,
     marginVertical: 8,
     textAlignVertical: 'top',
+    borderColor: theme.colors.red,
+    borderWidth: 1,
+  },
+  textAreaSmall: {
+    width: '100%',
+    height: normalize(80),
+    borderRadius: 10,
+    backgroundColor: theme.colors.white,
+    fontSize: 16,
+    paddingHorizontal: 20,
+    marginVertical: 8,
+    textAlignVertical: 'top',
+  },
+  textAreaSmallError: {
+    width: '100%',
+    height: normalize(80),
+    borderRadius: 10,
+    backgroundColor: theme.colors.white,
+    fontSize: 16,
+    paddingHorizontal: 20,
+    marginVertical: 8,
+    textAlignVertical: 'top',
+    borderColor: theme.colors.red,
+    borderWidth: 1,
   },
   btnImage: {
     alignSelf: 'flex-end',
@@ -173,7 +211,8 @@ const styles = StyleSheet.create({
     width: '50%',
     borderRadius: 10,
     paddingVertical: 8,
-    marginVertical: 5,
+    marginTop: 5,
+    marginBottom: 30,
     alignSelf: 'center',
   },
   titleSeatWrapper: {
@@ -203,11 +242,13 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   inputSeatStyle: {
-    width: '40%',
+    width: '45%',
     backgroundColor: theme.colors.white,
-    height: 35,
+    height: normalize(40),
+    fontSize: 15,
     borderRadius: 10,
-    padding: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 'auto',
   },
   plusButton: {
     width: 20,
@@ -221,10 +262,12 @@ const defaultTime =
 
 function EditProfilePage({route, navigation}) {
   const {
+    foodcourt_id,
     foodcourt_name,
     foodcourt_address,
     foodcourt_description,
     foodcourt_image,
+    getFoodcourtById,
   } = route.params;
   const [foodcourtName, onChangeFoodcourtName] = React.useState(foodcourt_name);
   const [foodcourtAddress, onChangeFoodcourtAddress] = React.useState(
@@ -272,6 +315,29 @@ function EditProfilePage({route, navigation}) {
     {day: '7', ...listOpenCloseHour},
   ]);
 
+  function checkData() {
+    const bodyOpeningHour = getBodyOpenHour();
+    const objBody = getBodySeat();
+    if (
+      foodcourtName.length === 0 ||
+      foodcourtAddress.length === 0 ||
+      foodcourtDesc.length === 0 ||
+      fileData.length === 0 ||
+      bodyOpeningHour.length === 0 ||
+      (Object.keys(objBody).length === 0 && objBody.constructor === Object)
+
+    ) {
+      alertMessage({
+        titleMessage: 'Error',
+        bodyMessage: 'All data must be filled!',
+        btnText: 'Try Again',
+        btnCancel: true,
+      });
+    } else {
+      updateFoodcourt();
+    }
+  }
+
   function chooseImage() {
     let options = {
       title: 'Select Image',
@@ -313,6 +379,11 @@ function EditProfilePage({route, navigation}) {
       );
     }
   }
+
+  const formatDate = (params) => {
+    const times = new Date(params);
+    return `${String(times.getHours()).padStart(2, '0')}:${String(times.getMinutes()).padStart(2, '0')}`;
+  };
 
   const onChange = (event, selectedValue) => {
     setShow(false);
@@ -356,20 +427,19 @@ function EditProfilePage({route, navigation}) {
     setCheckBoxChecked(tempCheckBoxChecked);
   };
 
-  const formatDate = (params) => {
-    const times = new Date(params);
-    return `${String(times.getHours()).padStart(2, '0')}:${String(times.getMinutes()).padStart(2, '0')}`;
-  };
-
-  async function updateFoodcourt() {
-    setIsLoading(true);
+  const getBodySeat = () => {
     const objSeat = seats[0];
     let objBody = {};
-    for (const [value] of Object.entries(objSeat)) {
+    // eslint-disable-next-line no-unused-vars
+    for (const [key, value] of Object.entries(objSeat)) {
       if (value.isShow === 1) {
         objBody[value.type] = value.qty;
       }
     }
+    return objBody;
+  };
+
+  const getBodyOpenHour = () => {
     let bodyOpeningHour = [];
     openingHourList.forEach((item, index) => {
       if (item.day <= 7) {
@@ -379,36 +449,49 @@ function EditProfilePage({route, navigation}) {
             openHour: formatDate(item.openHour),
             closeHour: formatDate(item.closeHour),
           };
-          console.log(tempObj);
           bodyOpeningHour.push(tempObj);
         }
       }
     });
+
+    return bodyOpeningHour;
+  };
+
+  async function updateFoodcourt() {
+    setIsLoading(true);
     try {
       const response = await axios.put(
         'https://food-planet.herokuapp.com/foodcourts/update',
         {
-          foodcourtId: 1,
+          foodcourtId: foodcourt_id,
           name: foodcourtName,
           address: foodcourtAddress,
           description: foodcourtDesc,
-          openingHourList: bodyOpeningHour,
-          seats: objBody,
+          openingHourList: getBodyOpenHour(),
+          seats: getBodySeat(),
           image: foodcourt_image,
         },
       );
-      console.log(response.data);
       if (response.data.msg === 'Update foodcourt success') {
         alertMessage({
           titleMessage: 'Success',
           bodyMessage: 'Update Profile successfully',
           btnText: 'OK',
-          onPressOK: () => navigation.goBack(),
+          onPressOK: () => {
+            getFoodcourtById();
+            navigation.goBack();
+          },
           btnCancel: false,
         });
       }
     } catch (error) {
       console.log('error:', error);
+      alertMessage({
+        titleMessage: 'Error',
+        bodyMessage: 'Failed update profile!',
+        btnText: 'Try Again',
+        btnCancel: true,
+      });
     }
     setIsLoading(false);
   }
@@ -433,7 +516,6 @@ function EditProfilePage({route, navigation}) {
   };
 
   const decreaseInputSeat = (index, item) => {
-    console.log(index);
     let arr = [];
     const obj = seats[0];
     let tempObj = obj;
@@ -517,7 +599,7 @@ function EditProfilePage({route, navigation}) {
       <View style={styles.innerContainer}>
         <Title txtStyle={styles.titleText} text="Edit My Information" />
         <ScrollView showsVerticalScrollIndicator={false}>
-          <View>{renderFileData()}</View>
+          {renderFileData()}
           <ButtonKit
             source={require('../assets/photo.png')}
             wrapperStyle={styles.btnImage}
@@ -525,29 +607,29 @@ function EditProfilePage({route, navigation}) {
           />
           <View style={styles.contentContainer}>
             <TextInput
-              style={styles.inputStyle}
+              style={foodcourtName.length === 0 ? styles.inputStyleError : styles.inputStyle}
               onChangeText={(text) => onChangeFoodcourtName(text)}
               value={foodcourtName}
               autoCapitalize="none"
               placeholder={foodcourt_name}
             />
             <TextInput
-              style={styles.textAreaSmall}
+              style={foodcourtAddress.length === 0 ? styles.textAreaSmallError : styles.textAreaSmall}
               onChangeText={(text) => onChangeFoodcourtAddress(text)}
               value={foodcourtAddress}
               autoCapitalize="none"
               placeholder={foodcourt_address}
               numberOfLines={4}
-              multiline={true}
+              multiline
             />
             <TextInput
-              style={styles.textArea}
+              style={foodcourtDesc.length === 0 ? styles.textAreaError : styles.textArea}
               onChangeText={(text) => onChangeFoodcourtDesc(text)}
               value={foodcourtDesc}
               autoCapitalize="none"
               placeholder={foodcourt_description}
               numberOfLines={4}
-              multiline={true}
+              multiline
             />
             <Text style={styles.titleInput}>Input Opening Hour List :</Text>
             <Text style={styles.subTitleInputHour}>
@@ -725,7 +807,7 @@ function EditProfilePage({route, navigation}) {
             title="Submit"
             txtStyle={styles.btnText}
             wrapperStyle={styles.btnWrapper}
-            onPress={updateFoodcourt}
+            onPress={() => checkData()}
             isLoading={isLoading}
           />
           {show && (

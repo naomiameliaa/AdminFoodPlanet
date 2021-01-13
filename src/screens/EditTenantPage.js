@@ -24,6 +24,9 @@ const styles = StyleSheet.create({
   innerContainer: {
     padding: normalize(20),
   },
+  contentWrapper: {
+    marginBottom: normalize(60),
+  },
   titleText: {
     fontSize: normalize(22),
     marginTop: 15,
@@ -50,23 +53,49 @@ const styles = StyleSheet.create({
   },
   inputStyle: {
     width: '100%',
-    height: 40,
+    height: normalize(42),
     borderRadius: 10,
     backgroundColor: theme.colors.white,
-    fontSize: 18,
+    fontSize: 16,
     paddingHorizontal: 20,
-    marginVertical: 8,
+    paddingVertical: 'auto',
+    marginVertical: 10,
     justifyContent: 'center',
+  },
+  inputStyleError: {
+    width: '100%',
+    height: normalize(42),
+    borderRadius: 10,
+    backgroundColor: theme.colors.white,
+    fontSize: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 'auto',
+    marginVertical: 10,
+    justifyContent: 'center',
+    borderColor: theme.colors.red,
+    borderWidth: 1,
   },
   textArea: {
     width: '100%',
-    height: 120,
+    height: normalize(120),
     borderRadius: 10,
     backgroundColor: theme.colors.white,
-    fontSize: 18,
+    fontSize: 16,
     paddingHorizontal: 20,
-    marginTop: 8,
+    marginVertical: 8,
     textAlignVertical: 'top',
+  },
+  textAreaError: {
+    width: '100%',
+    height: normalize(120),
+    borderRadius: 10,
+    backgroundColor: theme.colors.white,
+    fontSize: 16,
+    paddingHorizontal: 20,
+    marginVertical: 8,
+    textAlignVertical: 'top',
+    borderColor: theme.colors.red,
+    borderWidth: 1,
   },
   multiSelectStyle: {
     borderRadius: 10,
@@ -81,7 +110,7 @@ const styles = StyleSheet.create({
     width: '50%',
     borderRadius: 10,
     paddingVertical: 8,
-    marginTop: 30,
+    marginVertical: 30,
     alignSelf: 'center',
   },
   images: {
@@ -98,6 +127,7 @@ function EditTenantPage({route, navigation}) {
     tenantDescription,
     tenantCategory,
     tenantImage,
+    getTenantData,
   } = route.params;
   const [tenant_name, onChangeTenantName] = React.useState(tenantName);
   const [tenant_description, onChangeTenantDescription] = React.useState(
@@ -107,6 +137,24 @@ function EditTenantPage({route, navigation}) {
   const [listCategory, setListCategory] = React.useState([]);
   const [fileData, setFileData] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
+
+  function checkData() {
+    if (
+      tenant_name.length === 0 ||
+      tenant_description.length === 0 ||
+      selectedItems.length === 0 ||
+      fileData.length === 0
+    ) {
+      alertMessage({
+        titleMessage: 'Error',
+        bodyMessage: 'All data must be filled!',
+        btnText: 'Try Again',
+        btnCancel: true,
+      });
+    } else {
+      editTenant();
+    }
+  }
 
   // eslint-disable-next-line no-shadow
   const onSelectedItemsChange = (selectedItems) => {
@@ -202,7 +250,10 @@ function EditTenantPage({route, navigation}) {
           titleMessage: 'Success',
           bodyMessage: 'Success Update Tenant',
           btnText: 'OK',
-          onPressOK: () => navigation.goBack(),
+          onPressOK: () => {
+            navigation.goBack();
+            getTenantData();
+          },
           btnCancel: false,
         });
       }
@@ -226,7 +277,9 @@ function EditTenantPage({route, navigation}) {
     <SafeAreaView style={styles.container}>
       <View style={styles.innerContainer}>
         <Title txtStyle={styles.titleText} text="Edit Tenant" />
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView
+          style={styles.contentWrapper}
+          showsVerticalScrollIndicator={false}>
           {renderFileData()}
           <ButtonKit
             source={require('../assets/photo.png')}
@@ -235,18 +288,27 @@ function EditTenantPage({route, navigation}) {
           />
           <View style={styles.contentContainer}>
             <TextInput
-              style={styles.inputStyle}
+              style={
+                tenant_name.length === 0
+                  ? styles.inputStyleError
+                  : styles.inputStyle
+              }
               onChangeText={(text) => onChangeTenantName(text)}
               value={tenant_name}
               autoCapitalize="none"
               placeholder="Tenant Name"
             />
             <TextInput
-              style={styles.textArea}
+              style={
+                tenant_description.length === 0
+                  ? styles.textAreaError
+                  : styles.textArea
+              }
               onChangeText={(text) => onChangeTenantDescription(text)}
               value={tenant_description}
               autoCapitalize="none"
               placeholder="Tenant Description"
+              multiline
             />
           </View>
           <MultiSelect
@@ -273,7 +335,7 @@ function EditTenantPage({route, navigation}) {
             title="Submit"
             txtStyle={styles.btnText}
             wrapperStyle={styles.btnWrapper}
-            onPress={editTenant}
+            onPress={() => checkData()}
             isLoading={isLoading}
           />
         </ScrollView>

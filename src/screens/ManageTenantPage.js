@@ -39,6 +39,7 @@ const styles = StyleSheet.create({
   btnAddWrapper: {
     alignSelf: 'flex-end',
     paddingHorizontal: 8,
+    marginBottom: normalize(10),
   },
   titleText: {
     fontSize: normalize(22),
@@ -202,6 +203,7 @@ function ManageTenantPage({navigation}) {
                   tenantDescription: item.description,
                   tenantCategory: item.category,
                   tenantImage: item.image,
+                  getTenantData: getTenantData,
                 });
               }}
             />
@@ -224,7 +226,9 @@ function ManageTenantPage({navigation}) {
           txtStyle={styles.btnTxtAdd}
           wrapperStyle={styles.btnAddWrapper}
           onPress={() => {
-            navigation.navigate('AddTenantPage');
+            navigation.navigate('AddTenantPage', {
+              getTenantData: getTenantData,
+            });
           }}
         />
         <Title text="Manage Tenants" txtStyle={styles.titleText} />

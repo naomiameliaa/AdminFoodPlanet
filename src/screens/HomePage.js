@@ -1,5 +1,6 @@
 import * as React from 'react';
 import {
+  ScrollView,
   View,
   Text,
   Image,
@@ -28,7 +29,7 @@ const styles = StyleSheet.create({
   },
   btnLogoutWrapper: {
     alignSelf: 'flex-end',
-    height: '5%',
+    marginBottom: 10,
   },
   btnTxtLogout: {
     color: theme.colors.red,
@@ -201,76 +202,79 @@ function HomePage({navigation}) {
             isLoading={isLoadingLogout}
             colorSpinner={theme.colors.red}
           />
-          <Title text="Welcome, Admin!" txtStyle={styles.titleStyle} />
-          <Image
-            style={styles.foodcourtImg}
-            source={{uri: `data:image/jpeg;base64,${foodcourtData.image}`}}
-          />
-          <View style={styles.horizontalWrapper}>
-            <View style={styles.detailFoodcourt}>
-              <Text style={styles.titleFoodCourt} numberOfLines={1}>
-                {foodcourtData.name}
-              </Text>
-              <Text style={styles.txtStyle}>{foodcourtData.address}</Text>
-              <Text style={styles.txtStyle}>{foodcourtData.description}</Text>
-            </View>
-            <ButtonKit
-              source={require('../assets/info.png')}
-              wrapperStyle={styles.infoStyle}
-              onPress={() =>
-                navigation.navigate('DetailFoodcourt', {
-                  foodcourtImage: foodcourtData.image,
-                  foodcourtName: foodcourtData.name,
-                  foodcourtDesc: foodcourtData.description,
-                  foodcourtLoc: foodcourtData.address,
-                  foodcourtHourList: foodcourtData.openingHourList,
-                })
-              }
+          <ScrollView showsVerticalScrollIndicator={false}>
+            <Title text="Welcome, Admin!" txtStyle={styles.titleStyle} />
+            <Image
+              style={styles.foodcourtImg}
+              source={{uri: `data:image/jpeg;base64,${foodcourtData.image}`}}
             />
-          </View>
-          <View style={styles.btnContainer}>
-            <TouchableOpacity
-              style={styles.btnWrapper}
-              onPress={() => {
-                navigation.navigate('ManageTenantPage');
-              }}>
-              <Image
-                style={styles.btnStyle}
-                source={require('../assets/settings-gears.png')}
-                resizeMode="contain"
+            <View style={styles.horizontalWrapper}>
+              <View style={styles.detailFoodcourt}>
+                <Text style={styles.titleFoodCourt} numberOfLines={1}>
+                  {foodcourtData.name}
+                </Text>
+                <Text style={styles.txtStyle}>{foodcourtData.description}</Text>
+              </View>
+              <ButtonKit
+                source={require('../assets/info.png')}
+                wrapperStyle={styles.infoStyle}
+                onPress={() => {
+                  navigation.navigate('DetailFoodcourt', {
+                    foodcourtImage: foodcourtData.image,
+                    foodcourtName: foodcourtData.name,
+                    foodcourtDesc: foodcourtData.description,
+                    foodcourtLoc: foodcourtData.address,
+                    foodcourtHourList: foodcourtData.openingHourList,
+                  });
+                }}
               />
-              <Text style={styles.btnText}>Manage Tenant</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.btnWrapper}
-              onPress={() => {
-                navigation.navigate('EditProfilePage', {
-                  foodcourt_name: foodcourtData.name,
-                  foodcourt_address: foodcourtData.address,
-                  foodcourt_description: foodcourtData.description,
-                  foodcourt_image: foodcourtData.image,
-                });
-              }}>
-              <Image
-                style={styles.btnStyle}
-                source={require('../assets/edit-info.png')}
-                resizeMode="contain"
-              />
-              <Text style={styles.btnText}>Edit Foodcourt Information</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.btnWrapper}
-              onPress={() => {
-                navigation.navigate('ChangePasswordPage');
-              }}>
-              <Image
-                style={styles.btnStyle}
-                source={require('../assets/padlock.png')}
-                resizeMode="contain"
-              />
-              <Text style={styles.btnText}>Change Password</Text>
-            </TouchableOpacity>
-          </View>
+            </View>
+            <View style={styles.btnContainer}>
+              <TouchableOpacity
+                style={styles.btnWrapper}
+                onPress={() => {
+                  navigation.navigate('ManageTenantPage');
+                }}>
+                <Image
+                  style={styles.btnStyle}
+                  source={require('../assets/settings-gears.png')}
+                  resizeMode="contain"
+                />
+                <Text style={styles.btnText}>Manage Tenant</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.btnWrapper}
+                onPress={() => {
+                  navigation.navigate('EditProfilePage', {
+                    foodcourt_id: foodcourtData.foodcourtId,
+                    foodcourt_name: foodcourtData.name,
+                    foodcourt_address: foodcourtData.address,
+                    foodcourt_description: foodcourtData.description,
+                    foodcourt_image: foodcourtData.image,
+                    getFoodcourtById: getFoodcourtById,
+                  });
+                }}>
+                <Image
+                  style={styles.btnStyle}
+                  source={require('../assets/edit-info.png')}
+                  resizeMode="contain"
+                />
+                <Text style={styles.btnText}>Edit Foodcourt Information</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.btnWrapper}
+                onPress={() => {
+                  navigation.navigate('ChangePasswordPage');
+                }}>
+                <Image
+                  style={styles.btnStyle}
+                  source={require('../assets/padlock.png')}
+                  resizeMode="contain"
+                />
+                <Text style={styles.btnText}>Change Password</Text>
+              </TouchableOpacity>
+            </View>
+          </ScrollView>
         </View>
       )}
     </SafeAreaView>

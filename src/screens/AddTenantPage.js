@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
 import {
   View,
@@ -23,6 +22,9 @@ const styles = StyleSheet.create({
   },
   innerContainer: {
     padding: normalize(20),
+  },
+  contentWrapper: {
+    marginBottom: normalize(60),
   },
   titleText: {
     fontSize: normalize(22),
@@ -50,23 +52,49 @@ const styles = StyleSheet.create({
   },
   inputStyle: {
     width: '100%',
-    height: 40,
+    height: normalize(42),
     borderRadius: 10,
     backgroundColor: theme.colors.white,
-    fontSize: 18,
+    fontSize: 16,
     paddingHorizontal: 20,
-    marginVertical: 8,
+    paddingVertical: 'auto',
+    marginVertical: 10,
     justifyContent: 'center',
+  },
+  inputStyleError: {
+    width: '100%',
+    height: normalize(42),
+    borderRadius: 10,
+    backgroundColor: theme.colors.white,
+    fontSize: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 'auto',
+    marginVertical: 10,
+    justifyContent: 'center',
+    borderColor: theme.colors.red,
+    borderWidth: 1,
   },
   textArea: {
     width: '100%',
-    height: 120,
+    height: normalize(120),
     borderRadius: 10,
     backgroundColor: theme.colors.white,
-    fontSize: 18,
+    fontSize: 16,
     paddingHorizontal: 20,
-    marginTop: 8,
+    marginVertical: 8,
     textAlignVertical: 'top',
+  },
+  textAreaError: {
+    width: '100%',
+    height: normalize(120),
+    borderRadius: 10,
+    backgroundColor: theme.colors.white,
+    fontSize: 16,
+    paddingHorizontal: 20,
+    marginVertical: 8,
+    textAlignVertical: 'top',
+    borderColor: theme.colors.red,
+    borderWidth: 1,
   },
   multiSelectStyle: {
     borderRadius: 10,
@@ -81,7 +109,7 @@ const styles = StyleSheet.create({
     width: '50%',
     borderRadius: 10,
     paddingVertical: 8,
-    marginTop: 30,
+    marginVertical: 30,
     alignSelf: 'center',
   },
   txtStyle: {
@@ -94,7 +122,8 @@ const styles = StyleSheet.create({
   },
 });
 
-function AddTenantPage({navigation}) {
+function AddTenantPage({navigation, route}) {
+  const {getTenantData} = route.params;
   const [tenantEmail, onChangeTenantEmail] = React.useState('');
   const [tenantName, onChangeTenantName] = React.useState('');
   const [tenantDescription, onChangeTenantDescription] = React.useState('');
@@ -102,6 +131,24 @@ function AddTenantPage({navigation}) {
   const [listCategory, setListCategory] = React.useState([]);
   const [fileData, setFileData] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
+
+  function checkData() {
+    if (
+      tenantName.length === 0 ||
+      tenantDescription.length === 0 ||
+      selectedItems.length === 0 ||
+      fileData.length === 0
+    ) {
+      alertMessage({
+        titleMessage: 'Error',
+        bodyMessage: 'All data must be filled!',
+        btnText: 'Try Again',
+        btnCancel: true,
+      });
+    } else {
+      addNewTenant();
+    }
+  }
 
   // eslint-disable-next-line no-shadow
   const onSelectedItemsChange = (selectedItems) => {
@@ -162,7 +209,6 @@ function AddTenantPage({navigation}) {
         'https://food-planet.herokuapp.com/tenants/allCategories',
       );
       if (response.data.msg === 'Query success') {
-        console.log('ini response', response.data.object);
         setListCategory(response.data.object);
       }
     } catch (error) {
@@ -203,12 +249,14 @@ function AddTenantPage({navigation}) {
         },
       );
       if (response.data.msg === 'Create tenant success') {
-        console.log('add new tenant: ', tenantAdminId);
         alertMessage({
           titleMessage: 'Success',
           bodyMessage: 'Success add new tenant',
           btnText: 'OK',
-          onPressOK: () => navigation.goBack(),
+          onPressOK: () => {
+            navigation.goBack();
+            getTenantData();
+          },
           btnCancel: false,
         });
       }
@@ -232,7 +280,9 @@ function AddTenantPage({navigation}) {
     <SafeAreaView style={styles.container}>
       <View style={styles.innerContainer}>
         <Title txtStyle={styles.titleText} text="Add New Tenant" />
-        <ScrollView showsVerticalScrollIndicator={false}>
+        <ScrollView
+          style={styles.contentWrapper}
+          showsVerticalScrollIndicator={false}>
           {renderFileData()}
           <ButtonKit
             source={require('../assets/photo.png')}
@@ -248,18 +298,27 @@ function AddTenantPage({navigation}) {
               placeholder="Tenant Admin Email"
             />
             <TextInput
-              style={styles.inputStyle}
+              style={
+                tenantName.length === 0
+                  ? styles.inputStyleError
+                  : styles.inputStyle
+              }
               onChangeText={(text) => onChangeTenantName(text)}
               value={tenantName}
               autoCapitalize="none"
               placeholder="Tenant Name"
             />
             <TextInput
-              style={styles.textArea}
+              style={
+                tenantDescription.length === 0
+                  ? styles.textAreaError
+                  : styles.textArea
+              }
               onChangeText={(text) => onChangeTenantDescription(text)}
               value={tenantDescription}
               autoCapitalize="none"
               placeholder="Tenant Description"
+              multiline
             />
           </View>
           <MultiSelect
@@ -286,7 +345,7 @@ function AddTenantPage({navigation}) {
             title="Submit"
             txtStyle={styles.btnText}
             wrapperStyle={styles.btnWrapper}
-            onPress={addNewTenant}
+            onPress={() => checkData()}
             isLoading={isLoading}
           />
         </ScrollView>

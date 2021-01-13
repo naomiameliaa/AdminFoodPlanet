@@ -12,7 +12,7 @@ import ButtonKit from '../components/ButtonKit';
 import ButtonText from '../components/ButtonText';
 import Title from '../components/Title';
 import theme from '../theme';
-import {alertMessage} from '../utils';
+import {alertMessage, normalize} from '../utils';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -37,13 +37,27 @@ const styles = StyleSheet.create({
   },
   inputStyle: {
     width: '90%',
-    height: 40,
+    height: normalize(42),
     borderRadius: 20,
     backgroundColor: theme.colors.white,
-    fontSize: 18,
+    fontSize: 16,
     paddingHorizontal: 20,
+    paddingVertical: 'auto',
     marginVertical: 10,
     justifyContent: 'center',
+  },
+  inputStyleError: {
+    width: '90%',
+    height: normalize(42),
+    borderRadius: 20,
+    backgroundColor: theme.colors.white,
+    fontSize: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 'auto',
+    marginVertical: 10,
+    justifyContent: 'center',
+    borderColor: theme.colors.red,
+    borderWidth: 1,
   },
   content: {
     width: SCREEN_WIDTH * 0.8,
@@ -84,17 +98,29 @@ function ForgotPassword({navigation}) {
   const [email, onChangeEmail] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
 
-  function validationEmail() {
-    if (email === '') {
+  function checkInput() {
+    if (email.length === 0) {
       alertMessage({
         titleMessage: 'Error',
-        bodyMessage: 'Email field is required',
-        btnText: 'OK',
+        bodyMessage: 'Email field is required!',
+        btnText: 'Try Again',
+        btnCancel: true,
+      });
+    } else if (!validateEmail) {
+      alertMessage({
+        titleMessage: 'Error',
+        bodyMessage: 'Email is invalid!',
+        btnText: 'Try Again',
         btnCancel: true,
       });
     } else {
       sendEmail();
     }
+  }
+
+  function validateEmail() {
+    var regExp = /\S+@\S+\.\S+/;
+    return regExp.test(email);
   }
 
   async function sendEmail() {
@@ -139,7 +165,11 @@ function ForgotPassword({navigation}) {
         </Text>
         <View style={styles.inputContainer}>
           <TextInput
-            style={styles.inputStyle}
+            style={
+              email.length === 0 || !validateEmail
+                ? styles.inputStyleError
+                : styles.inputStyle
+            }
             onChangeText={(text) => onChangeEmail(text)}
             value={email}
             textContentType="emailAddress"
@@ -150,7 +180,7 @@ function ForgotPassword({navigation}) {
             title="Send"
             txtStyle={styles.sendTxt}
             wrapperStyle={styles.sendWrapper}
-            onPress={validationEmail}
+            onPress={() => checkInput()}
             isLoading={isLoading}
           />
         </View>

@@ -11,7 +11,8 @@ import axios from 'axios';
 import ButtonText from '../components/ButtonText';
 import Title from '../components/Title';
 import theme from '../theme';
-import {normalize, getData, alertMessage} from '../utils';
+import {normalize, getData, alertMessage, removeData} from '../utils';
+import {AuthContext} from '../../context';
 
 const {width: SCREEN_WIDTH} = Dimensions.get('window');
 
@@ -54,13 +55,25 @@ const styles = StyleSheet.create({
     marginVertical: 5,
     alignSelf: 'center',
   },
+  inputStyle: {
+    width: '90%',
+    height: normalize(42),
+    borderRadius: 20,
+    backgroundColor: theme.colors.white,
+    fontSize: 16,
+    paddingHorizontal: 20,
+    paddingVertical: 'auto',
+    marginVertical: 10,
+    justifyContent: 'center',
+  },
   inputStyleError: {
     width: '90%',
-    height: 40,
-    borderRadius: 10,
+    height: normalize(42),
+    borderRadius: 20,
     backgroundColor: theme.colors.white,
-    fontSize: 18,
+    fontSize: 16,
     paddingHorizontal: 20,
+    paddingVertical: 'auto',
     marginVertical: 10,
     justifyContent: 'center',
     borderColor: theme.colors.red,
@@ -80,6 +93,7 @@ function ChangePassword({navigation}) {
   const [oldPassword, onChangeOldPassword] = React.useState('');
   const [password, onChangePassword] = React.useState('');
   const [confirmPassword, onChangeConfirmPassword] = React.useState('');
+  const {signOut} = React.useContext(AuthContext);
 
   const getDataAdmin = async () => {
     const dataAdmin = await getData('adminData');
@@ -91,7 +105,18 @@ function ChangePassword({navigation}) {
   };
 
   function validationPassword() {
-    if (confirmPassword !== password) {
+    if (
+      oldPassword.length === 0 ||
+      password.length === 0 ||
+      confirmPassword === 0
+    ) {
+      alertMessage({
+        titleMessage: 'Error',
+        bodyMessage: 'All fields are required!',
+        btnText: 'Try Again',
+        btnCancel: true,
+      });
+    } else if (confirmPassword !== password) {
       alertMessage({
         titleMessage: 'Error',
         bodyMessage: 'Password does not match',
@@ -102,6 +127,13 @@ function ChangePassword({navigation}) {
       changePassword();
     }
   }
+
+  const logout = async () => {
+    const removeLocalData = await removeData('adminData');
+    if (removeLocalData) {
+      signOut();
+    }
+  };
 
   async function changePassword() {
     setIsLoading(true);
@@ -115,7 +147,7 @@ function ChangePassword({navigation}) {
           titleMessage: 'Success',
           bodyMessage: 'Password changed successfully',
           btnText: 'OK',
-          onPressOK: () => navigation.goBack(),
+          onPressOK: () => logout(),
           btnCancel: false,
         });
       }
@@ -138,7 +170,11 @@ function ChangePassword({navigation}) {
           Please enter your old password and then your new password.
         </Text>
         <TextInput
-          style={styles.txtInput}
+          style={
+            oldPassword.length === 0
+              ? styles.inputStyleError
+              : styles.inputStyle
+          }
           onChangeText={(text) => onChangeOldPassword(text)}
           value={oldPassword}
           textContentType="password"
@@ -148,9 +184,9 @@ function ChangePassword({navigation}) {
         />
         <TextInput
           style={
-            confirmPassword !== password
+            confirmPassword !== password || password.length === 0
               ? styles.inputStyleError
-              : styles.txtInput
+              : styles.inputStyle
           }
           onChangeText={(text) => onChangePassword(text)}
           value={password}
@@ -161,9 +197,9 @@ function ChangePassword({navigation}) {
         />
         <TextInput
           style={
-            confirmPassword !== password
+            confirmPassword !== password || confirmPassword.length === 0
               ? styles.inputStyleError
-              : styles.txtInput
+              : styles.inputStyle
           }
           onChangeText={(text) => onChangeConfirmPassword(text)}
           value={confirmPassword}
