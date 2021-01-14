@@ -29,7 +29,7 @@ const styles = StyleSheet.create({
   },
   btnLogoutWrapper: {
     alignSelf: 'flex-end',
-    marginBottom: 10,
+    width: 90,
   },
   btnTxtLogout: {
     color: theme.colors.red,
