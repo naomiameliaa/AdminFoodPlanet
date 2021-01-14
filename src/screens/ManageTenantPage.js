@@ -4,7 +4,6 @@ import {
   View,
   Text,
   Image,
-  TextInput,
   SafeAreaView,
   StyleSheet,
   ScrollView,
@@ -44,28 +43,6 @@ const styles = StyleSheet.create({
   titleText: {
     fontSize: normalize(22),
   },
-  searchWrapper: {
-    width: '100%',
-    flexDirection: 'row',
-    marginRight: -normalize(35),
-    alignSelf: 'center',
-    marginBottom: normalize(20),
-  },
-  searchStyle: {
-    width: '100%',
-    borderRadius: 10,
-    borderWidth: 1,
-    fontSize: 18,
-    paddingHorizontal: normalize(50),
-    height: 45,
-  },
-  iconSearch: {
-    height: 22,
-    width: 22,
-    marginVertical: normalize(10),
-    marginRight: -normalize(35),
-    zIndex: 1,
-  },
   boxContainer: {
     marginBottom: normalize(10),
     flexDirection: 'row',
@@ -101,7 +78,6 @@ const styles = StyleSheet.create({
 
 function ManageTenantPage({navigation}) {
   const [tenantData, setTenantData] = React.useState(null);
-  const [searchWord, onChangeSearchWord] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
 
   React.useEffect(() => {
@@ -232,18 +208,6 @@ function ManageTenantPage({navigation}) {
           }}
         />
         <Title text="Manage Tenants" txtStyle={styles.titleText} />
-        <View style={styles.searchWrapper}>
-          <Image
-            style={styles.iconSearch}
-            source={require('../assets/search.png')}
-          />
-          <TextInput
-            style={styles.searchStyle}
-            onChangeText={(text) => onChangeSearchWord(text)}
-            value={searchWord}
-            placeholder="Search Tenant"
-          />
-        </View>
         <ScrollView showsVerticalScrollIndicator={false}>
           {isLoading ? (
             <SpinnerKit sizeSpinner="large" style={styles.spinnerKitStyle} />
