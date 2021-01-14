@@ -134,6 +134,7 @@ function AddTenantPage({navigation, route}) {
 
   function checkData() {
     if (
+      tenantEmail.length === 0 ||
       tenantName.length === 0 ||
       tenantDescription.length === 0 ||
       selectedItems.length === 0 ||
@@ -145,9 +146,21 @@ function AddTenantPage({navigation, route}) {
         btnText: 'Try Again',
         btnCancel: true,
       });
+    } else if (!validateEmail) {
+      alertMessage({
+        titleMessage: 'Error',
+        bodyMessage: 'Email is invalid!',
+        btnText: 'Try Again',
+        btnCancel: true,
+      });
     } else {
       addNewTenant();
     }
+  }
+
+  function validateEmail() {
+    var regExp = /\S+@\S+\.\S+/;
+    return regExp.test(tenantEmail);
   }
 
   // eslint-disable-next-line no-shadow
@@ -291,7 +304,11 @@ function AddTenantPage({navigation, route}) {
           />
           <View style={styles.contentContainer}>
             <TextInput
-              style={styles.inputStyle}
+              style={
+                tenantEmail.length === 0 || !validateEmail
+                  ? styles.inputStyleError
+                  : styles.inputStyle
+              }
               onChangeText={(text) => onChangeTenantEmail(text)}
               value={tenantEmail}
               autoCapitalize="none"
