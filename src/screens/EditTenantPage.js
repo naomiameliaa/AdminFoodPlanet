@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 import * as React from 'react';
 import {
   View,
@@ -8,7 +7,7 @@ import {
   StyleSheet,
   ScrollView,
 } from 'react-native';
-import {normalize, getData, alertMessage} from '../utils';
+import {normalize, alertMessage} from '../utils';
 import ButtonText from '../components/ButtonText';
 import ButtonKit from '../components/ButtonKit';
 import Title from '../components/Title';
@@ -203,20 +202,10 @@ function EditTenantPage({route, navigation}) {
     }
   }
 
-  const getDataAdmin = async () => {
-    const dataAdmin = await getData('adminData');
-    if (dataAdmin) {
-      return dataAdmin.foodcourtId;
-    } else {
-      return null;
-    }
-  };
-
   async function getListCategory() {
-    const foodcourtId = await getDataAdmin();
     try {
       const response = await axios.get(
-        `https://food-planet.herokuapp.com/foodcourts/allCategory?foodcourtId=${foodcourtId}`,
+        'https://food-planet.herokuapp.com/tenants/allCategories',
       );
       if (response.data.msg === 'Query success') {
         setListCategory(response.data.object);
