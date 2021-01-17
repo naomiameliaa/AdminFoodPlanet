@@ -123,9 +123,7 @@ function LandingPage({navigation}) {
         {
           params: {
             role: 'admin',
-          },
-          auth: {
-            username: email.toLowerCase(),
+            email: email.toLowerCase(),
             password: password,
           },
         },
