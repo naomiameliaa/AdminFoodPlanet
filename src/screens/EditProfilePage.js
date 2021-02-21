@@ -10,7 +10,7 @@ import {
   ScrollView,
   FlatList,
 } from 'react-native';
-import {normalize, alertMessage} from '../utils';
+import {normalize, alertMessage, getData, removeData} from '../utils';
 import ButtonText from '../components/ButtonText';
 import ButtonKit from '../components/ButtonKit';
 import Title from '../components/Title';
@@ -19,6 +19,7 @@ import axios from 'axios';
 import ImagePicker from 'react-native-image-picker';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import CheckBox from '@react-native-community/checkbox';
+import {AuthContext} from '../../context';
 
 const styles = StyleSheet.create({
   container: {
@@ -261,6 +262,7 @@ const defaultTime =
   'Wed Dec 16 2020 00:00:00 GMT+0700 (Western Indonesia Time)';
 
 function EditProfilePage({route, navigation}) {
+  const {signOut} = React.useContext(AuthContext);
   const {
     foodcourt_id,
     foodcourt_name,
@@ -457,6 +459,26 @@ function EditProfilePage({route, navigation}) {
     return bodyOpeningHour;
   };
 
+  const logout = async () => {
+    const dataUser = await getData('adminData');
+    if (dataUser !== null) {
+      await removeData('adminData');
+      await signOut();
+    }
+  };
+
+  function sessionTimedOut() {
+    alertMessage({
+      titleMessage: 'Session Timeout',
+      bodyMessage: 'Please re-login',
+      btnText: 'OK',
+      onPressOK: () => {
+        logout();
+      },
+      btnCancel: false,
+    });
+  }
+
   async function updateFoodcourt() {
     setIsLoading(true);
     try {
@@ -486,12 +508,16 @@ function EditProfilePage({route, navigation}) {
       }
     } catch (error) {
       console.log('error:', error);
-      alertMessage({
-        titleMessage: 'Error',
-        bodyMessage: 'Failed update profile!',
-        btnText: 'Try Again',
-        btnCancel: true,
-      });
+      if (error.response.status === 401) {
+        sessionTimedOut();
+      } else {
+        alertMessage({
+          titleMessage: 'Error',
+          bodyMessage: 'Failed update profile!',
+          btnText: 'Try Again',
+          btnCancel: true,
+        });
+      }
     }
     setIsLoading(false);
   }

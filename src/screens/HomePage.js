@@ -130,15 +130,30 @@ function HomePage({navigation}) {
       }
     } catch (error) {
       console.log('error:', error);
-      alertMessage({
-        titleMessage: 'Session Timeout',
-        bodyMessage: 'Please re-login',
-        btnText: 'OK',
-        onPressOK: () => signOutAdmin(),
-        btnCancel: false,
-      });
+      if (error.response.status === 401) {
+        sessionTimedOut();
+      } else {
+        alertMessage({
+          titleMessage: 'Error',
+          bodyMessage: 'Please try again later',
+          btnText: 'Try Again',
+          btnCancel: false,
+        });
+      }
     }
     setIsLoading(false);
+  }
+
+  function sessionTimedOut() {
+    alertMessage({
+      titleMessage: 'Session Timeout',
+      bodyMessage: 'Please re-login',
+      btnText: 'OK',
+      onPressOK: () => {
+        signOutAdmin();
+      },
+      btnCancel: false,
+    });
   }
 
   const signOutAdmin = async () => {
@@ -175,7 +190,7 @@ function HomePage({navigation}) {
     } catch (error) {
       alertMessage({
         titleMessage: 'Error',
-        bodyMessage: 'Incorrect password or email',
+        bodyMessage: 'Please try again later',
         btnText: 'Try Again',
         btnCancel: false,
       });

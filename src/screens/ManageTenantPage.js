@@ -9,13 +9,14 @@ import {
   ScrollView,
   FlatList,
 } from 'react-native';
-import {normalize, getData, alertMessage} from '../utils';
+import {normalize, getData, alertMessage, removeData} from '../utils';
 import ButtonKit from '../components/ButtonKit';
 import ButtonText from '../components/ButtonText';
 import Title from '../components/Title';
 import theme from '../theme';
 import axios from 'axios';
 import SpinnerKit from '../components/SpinnerKit';
+import {AuthContext} from '../../context';
 
 const styles = StyleSheet.create({
   container: {
@@ -79,10 +80,31 @@ const styles = StyleSheet.create({
 function ManageTenantPage({navigation}) {
   const [tenantData, setTenantData] = React.useState(null);
   const [isLoading, setIsLoading] = React.useState(false);
+  const {signOut} = React.useContext(AuthContext);
 
   React.useEffect(() => {
     getTenantData();
   }, []);
+
+  const logout = async () => {
+    const dataUser = await getData('adminData');
+    if (dataUser !== null) {
+      await removeData('adminData');
+      await signOut();
+    }
+  };
+
+  function sessionTimedOut() {
+    alertMessage({
+      titleMessage: 'Session Timeout',
+      bodyMessage: 'Please re-login',
+      btnText: 'OK',
+      onPressOK: () => {
+        logout();
+      },
+      btnCancel: false,
+    });
+  }
 
   async function getTenantData() {
     setIsLoading(true);
@@ -101,6 +123,9 @@ function ManageTenantPage({navigation}) {
       }
     } catch (error) {
       console.log(error);
+      if (error.response.status === 401) {
+        sessionTimedOut();
+      }
     }
     setIsLoading(false);
   }
@@ -120,6 +145,9 @@ function ManageTenantPage({navigation}) {
       }
     } catch (error) {
       console.log(error);
+      if (error.response.status === 401) {
+        sessionTimedOut();
+      }
     }
   }
 

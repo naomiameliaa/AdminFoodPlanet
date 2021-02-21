@@ -7,7 +7,7 @@ import {
   StyleSheet,
   ScrollView,
 } from 'react-native';
-import {normalize, getData, alertMessage} from '../utils';
+import {normalize, getData, alertMessage, removeData} from '../utils';
 import ButtonText from '../components/ButtonText';
 import ButtonKit from '../components/ButtonKit';
 import Title from '../components/Title';
@@ -15,6 +15,7 @@ import theme from '../theme';
 import axios from 'axios';
 import MultiSelect from 'react-native-multiple-select';
 import ImagePicker from 'react-native-image-picker';
+import {AuthContext} from '../../context';
 
 const styles = StyleSheet.create({
   container: {
@@ -131,6 +132,7 @@ function AddTenantPage({navigation, route}) {
   const [listCategory, setListCategory] = React.useState([]);
   const [fileData, setFileData] = React.useState('');
   const [isLoading, setIsLoading] = React.useState(false);
+  const {signOut} = React.useContext(AuthContext);
 
   function checkData() {
     if (
@@ -207,6 +209,26 @@ function AddTenantPage({navigation, route}) {
     }
   }
 
+  const logout = async () => {
+    const dataUser = await getData('adminData');
+    if (dataUser !== null) {
+      await removeData('adminData');
+      await signOut();
+    }
+  };
+
+  function sessionTimedOut() {
+    alertMessage({
+      titleMessage: 'Session Timeout',
+      bodyMessage: 'Please re-login',
+      btnText: 'OK',
+      onPressOK: () => {
+        logout();
+      },
+      btnCancel: false,
+    });
+  }
+
   const getDataAdmin = async () => {
     const dataAdmin = await getData('adminData');
     if (dataAdmin) {
@@ -226,6 +248,9 @@ function AddTenantPage({navigation, route}) {
       }
     } catch (error) {
       console.log(error);
+      if (error.response.status === 401) {
+        sessionTimedOut();
+      }
     }
   }
 
@@ -242,6 +267,9 @@ function AddTenantPage({navigation, route}) {
       }
     } catch (error) {
       console.log(error);
+      if (error.response.status === 401) {
+        sessionTimedOut();
+      }
     }
   }
 
@@ -275,12 +303,16 @@ function AddTenantPage({navigation, route}) {
       }
     } catch (error) {
       console.log(error);
-      alertMessage({
-        titleMessage: 'Error',
-        bodyMessage: 'Failed add new tenant',
-        btnText: 'Try Again',
-        btnCancel: false,
-      });
+      if (error.response.status === 401) {
+        sessionTimedOut();
+      } else {
+        alertMessage({
+          titleMessage: 'Error',
+          bodyMessage: 'Failed add new tenant',
+          btnText: 'Try Again',
+          btnCancel: false,
+        });
+      }
     }
     setIsLoading(false);
   }

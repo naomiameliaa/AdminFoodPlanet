@@ -7,7 +7,7 @@ import {
   StyleSheet,
   ScrollView,
 } from 'react-native';
-import {normalize, alertMessage} from '../utils';
+import {normalize, alertMessage, getData, removeData} from '../utils';
 import ButtonText from '../components/ButtonText';
 import ButtonKit from '../components/ButtonKit';
 import Title from '../components/Title';
@@ -15,6 +15,7 @@ import theme from '../theme';
 import axios from 'axios';
 import MultiSelect from 'react-native-multiple-select';
 import ImagePicker from 'react-native-image-picker';
+import {AuthContext} from '../../context';
 
 const styles = StyleSheet.create({
   container: {
@@ -134,8 +135,9 @@ function EditTenantPage({route, navigation}) {
   );
   const [selectedItems, setSelectedItems] = React.useState(tenantCategory);
   const [listCategory, setListCategory] = React.useState([]);
-  const [fileData, setFileData] = React.useState('');
+  const [fileData, setFileData] = React.useState(tenantImage);
   const [isLoading, setIsLoading] = React.useState(false);
+  const {signOut} = React.useContext(AuthContext);
 
   function checkData() {
     if (
@@ -202,6 +204,26 @@ function EditTenantPage({route, navigation}) {
     }
   }
 
+  const logout = async () => {
+    const dataUser = await getData('adminData');
+    if (dataUser !== null) {
+      await removeData('adminData');
+      await signOut();
+    }
+  };
+
+  function sessionTimedOut() {
+    alertMessage({
+      titleMessage: 'Session Timeout',
+      bodyMessage: 'Please re-login',
+      btnText: 'OK',
+      onPressOK: () => {
+        logout();
+      },
+      btnCancel: false,
+    });
+  }
+
   async function getListCategory() {
     try {
       const response = await axios.get(
@@ -212,26 +234,23 @@ function EditTenantPage({route, navigation}) {
       }
     } catch (error) {
       console.log(error);
+      if (error.response.status === 401) {
+        sessionTimedOut();
+      }
     }
   }
 
   async function editTenant() {
     setIsLoading(true);
     try {
-      const response = await axios.post(
-        'https://food-planet.herokuapp.com/tenants/update ',
+      const response = await axios.put(
+        'https://food-planet.herokuapp.com/tenants/update',
         {
           tenantId: tenantId,
-          name: tenantName,
-          description: tenantDescription,
+          name: tenant_name,
+          description: tenant_description,
           category: selectedItems,
           image: fileData,
-        },
-        {
-          auth: {
-            username: 'admin@mail.com',
-            password: 'password',
-          },
         },
       );
       if (response.data.msg === 'Update tenant success') {
@@ -248,12 +267,16 @@ function EditTenantPage({route, navigation}) {
       }
     } catch (error) {
       console.log(error);
-      alertMessage({
-        titleMessage: 'Error',
-        bodyMessage: 'Failed Update Tenant',
-        btnText: 'Try Again',
-        btnCancel: false,
-      });
+      if (error.response.status === 401) {
+        sessionTimedOut();
+      } else {
+        alertMessage({
+          titleMessage: 'Error',
+          bodyMessage: 'Failed Update Tenant',
+          btnText: 'Try Again',
+          btnCancel: false,
+        });
+      }
     }
     setIsLoading(false);
   }

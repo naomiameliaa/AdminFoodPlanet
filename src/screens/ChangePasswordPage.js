@@ -128,19 +128,49 @@ function ChangePassword({navigation}) {
     }
   }
 
-  const logout = async () => {
+  async function logout() {
+    setIsLoading(true);
+    try {
+      const response = await axios.post(
+        'https://food-planet.herokuapp.com/users/logout',
+      );
+      await signOutAdmin();
+    } catch (error) {
+      alertMessage({
+        titleMessage: 'Error',
+        bodyMessage: 'Please try again later',
+        btnText: 'Try Again',
+        btnCancel: false,
+      });
+    }
+    setIsLoading(false);
+  }
+
+  const signOutAdmin = async () => {
     const removeLocalData = await removeData('adminData');
     if (removeLocalData) {
       signOut();
     }
   };
 
+  function sessionTimedOut() {
+    alertMessage({
+      titleMessage: 'Session Timeout',
+      bodyMessage: 'Please re-login',
+      btnText: 'OK',
+      onPressOK: () => {
+        logout();
+      },
+      btnCancel: false,
+    });
+  }
+
   async function changePassword() {
     setIsLoading(true);
     try {
       const userId = await getDataAdmin();
       const response = await axios.post(
-        `http://food-planet.herokuapp.com/users/changePassword?userId=${userId}&oldPassword=${oldPassword}&newPassword=${confirmPassword}`,
+        `https://food-planet.herokuapp.com/users/changePassword?userId=${userId}&oldPassword=${oldPassword}&newPassword=${confirmPassword}`,
       );
       if (response.data.msg === 'Change password success') {
         alertMessage({
@@ -152,12 +182,16 @@ function ChangePassword({navigation}) {
         });
       }
     } catch (error) {
-      alertMessage({
-        titleMessage: 'Failed',
-        bodyMessage: 'Please try again later',
-        btnText: 'Try Again',
-        btnCancel: true,
-      });
+      if (error.response.status === 401) {
+        sessionTimedOut();
+      } else {
+        alertMessage({
+          titleMessage: 'Failed',
+          bodyMessage: 'Please try again later',
+          btnText: 'Try Again',
+          btnCancel: true,
+        });
+      }
     }
     setIsLoading(false);
   }
