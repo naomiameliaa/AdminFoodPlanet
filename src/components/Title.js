@@ -1,7 +1,7 @@
 import React from 'react';
 import {Text, StyleSheet} from 'react-native';
 import {normalize} from '../utils';
-
+// test
 const styles = StyleSheet.create({
   textStyle: {
     fontSize: normalize(30),
