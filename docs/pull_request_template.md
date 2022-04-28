@@ -12,7 +12,7 @@
 - [x] Task 2 ...
 - [ ] Task 3 ...
 
-<! -- Please define all tasks / change logs you do !-->
+<!-- Please define all tasks / change logs you do !-->
 
 ## Display Changes
 | Description | Before | After |
