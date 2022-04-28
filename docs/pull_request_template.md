@@ -2,11 +2,11 @@
 
 **Descriptions**
 ---
-**Issues    : [No Ticket JIRA]**
+> Issues    : [No Ticket JIRA]
 
-**Related PR  : #[No Related PR]**
+> Related PR  : #[No Related PR]
 
-- Please write a summary of the change and which issue is fixed.
+<!-- Please write a summary of the change and which issue is fixed. !-->
 
 **Task Lists / Changelogs**
 ---
